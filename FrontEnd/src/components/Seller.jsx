@@ -13,7 +13,6 @@ const SellerCards = () => {
       sellerName: 'Ganesan',
       location: 'Titakudi',
     },
-    // More sellers here...
   ];
 
   const openModal = (seller) => {
@@ -30,8 +29,8 @@ const SellerCards = () => {
     <div>
       <Navbar />
       <div className="px-4 py-8">
-        <h1 className="text-2xl font-semibold mb-6">Seller</h1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6">
+        <h1 className="text-2xl font-semibold mb-4 p-4">Seller</h1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6">
           {sellers.map((seller, index) => (
             <div
               key={index}

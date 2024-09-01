@@ -1,9 +1,10 @@
 import React from 'react';
+import { Carousel } from 'react-responsive-carousel';
 import { BsHandbag } from "react-icons/bs";
 import { PiPlantLight } from "react-icons/pi";
-import { CiLocationOn } from "react-icons/ci";
-import { CiUser } from "react-icons/ci";
-import { MdOutlineCategory,MdOutlineDescription,MdOutlineCurrencyRupee} from "react-icons/md";
+import { CiLocationOn, CiUser } from "react-icons/ci";
+import { MdOutlineCategory, MdOutlineDescription, MdOutlineCurrencyRupee } from "react-icons/md";
+import "react-responsive-carousel/lib/styles/carousel.min.css"; // Carousel styles
 
 const SellerDetailModal = ({ seller, isOpen, onClose }) => {
   if (!isOpen) return null;
@@ -18,57 +19,88 @@ const SellerDetailModal = ({ seller, isOpen, onClose }) => {
           ✕
         </button>
 
-        
-        <h2 className="text-2xl font-bold text-center mb-4">{seller.title}</h2>
-        <div className="flex items-start mb-4">
-          <img
-            src={seller.image}
-            alt={seller.title}
-            className="w-40 h-40 object-cover rounded-lg mr-6"
-          />
-          <div>
-            <div className="flex items-center mb-2">
-              <span className="mr-2"><BsHandbag /></span>
-              <p className="text-gray-700 font-medium">300 kg</p>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-2"><MdOutlineCurrencyRupee /></span>
-              <p className="text-gray-700 font-medium">இறைச்சி</p>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-2"><PiPlantLight /></span>
-              <p className="text-gray-700 font-medium">ஆக்ரானிக்</p>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-2"><CiLocationOn /></span>
-              <p className="text-gray-700 font-medium">{seller.location}</p>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-2"><CiUser /></span>
-              <p className="text-gray-700 font-medium">{seller.sellerName}</p>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-2">🏠</span>
-              <p className="text-gray-700 font-medium">Cuddalore</p>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-2"><MdOutlineCategory /></span>
-              <p className="text-gray-700 font-medium">Type</p>
-            </div>
-            <div className="flex items-center mb-2">
-              <span className="mr-2"><MdOutlineDescription /></span>
-              <p className="text-gray-700 font-medium">Type</p>
-            </div>
-          </div>
+          <div className="flex">
+          <div className="w-1/3 relative mt-10">
+    <Carousel
+      showArrows={false}
+      infiniteLoop={true}
+      showThumbs={false}
+      autoPlay={false}
+    >
+      <div className="relative">
+        <img src={seller.image} alt={seller.title} className="object-cover rounded-lg" />
+        <div className="flex justify-center mt-2">
+          <button
+            className="bg-gray-500 hover:bg-gray-700 text-white rounded-full p-2 mx-2 w-10"
+            onClick={() => {}}
+            aria-label="Previous"
+          >
+            ❮
+          </button>
+          <button
+            className="bg-gray-500 hover:bg-gray-700 text-white rounded-full p-2 mx-2 w-10"
+            onClick={() => {}}
+            aria-label="Next"
+          >
+          </button>
+        </div>
+      </div>
+      
+    </Carousel>
+  </div>
+
+<div className="w-2/3 pl-6">
+  <h2 className="text-2xl font-bold text-left mb-4">{seller.title}</h2>
+  <div className="grid grid-cols-3 gap-x-2 gap-y-4"> {/* Grid layout with 3 columns */}
+    {/* Detail items */}
+    <div className="flex items-center">
+      <BsHandbag className="text-gray-500 mr-2" />
+      <span className="font-semibold text-gray-800">Weight:</span>
+    </div>
+    <p className="text-gray-700 font-medium col-span-2">300 kg</p>
+    
+    <div className="flex items-center">
+      <MdOutlineCurrencyRupee className="text-gray-500 mr-2" />
+      <span className="font-semibold text-gray-800">Price:</span>
+    </div>
+    <p className="text-gray-700 font-medium col-span-2">இறைச்சி</p>
+    
+    <div className="flex items-center">
+      <PiPlantLight className="text-gray-500 mr-2" />
+      <span className="font-semibold text-gray-800">Material:</span>
+    </div>
+    <p className="text-gray-700 font-medium col-span-2">ஆக்ரானிக்</p>
+    
+    <div className="flex items-center">
+      <CiLocationOn className="text-gray-500 mr-2" />
+      <span className="font-semibold text-gray-800">Location:</span>
+    </div>
+    <p className="text-gray-700 font-medium col-span-2">{seller.location}</p>
+    
+    <div className="flex items-center">
+      <CiUser className="text-gray-500 mr-2" />
+      <span className="font-semibold text-gray-800">Seller:</span>
+    </div>
+    <p className="text-gray-700 font-medium col-span-2">{seller.sellerName}</p>
+    
+    
+    <div className="flex items-center">
+      <MdOutlineCategory className="text-gray-500 mr-2" />
+      <span className="font-semibold text-gray-800">Category:</span>
+    </div>
+    <p className="text-gray-700 font-medium col-span-2">Type</p>
+    
+    <div className="flex items-center">
+      <MdOutlineDescription className="text-gray-500 mr-2" />
+      <span className="font-semibold text-gray-800">Description:</span>
+    </div>
+    <p className="text-gray-700 font-medium col-span-2">Type</p>
+  </div>
+</div>
+
         </div>
 
-        {/* Description */}
-        <p className="text-gray-600 mb-4">
-          ஆரோக்கியமானமற்றும் சிறப்பான வகையிலான இறைச்சி அரிசி.
-        </p>
-
-        {/* Buttons */}
-        <div className="flex justify-center space-x-4">
+        <div className="flex justify-end space-x-4 mt-6">
           <button className="bg-[#25D366] text-white px-4 py-2 rounded-full flex items-center">
             💬 Whatsapp
           </button>
