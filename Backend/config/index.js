@@ -1,14 +1,22 @@
-const connectToDb = require('./db.js');
+const connectToDb = require('./db');
 const express = require('express');
-const app = express();
 const cors = require('cors');
+const registerRoute = require('../router/Register'); 
+
+const app = express();
+const port = 5000;
+
+
 connectToDb();
-port = 5000;
 
+// Middleware
 app.use(express.json());
-app.use(cors())
+app.use(cors());
 
 
-app.listen(port,()=>{
-    console.log("Server started");
-})
+app.use('/api', registerRoute);
+
+
+app.listen(port, () => {
+    console.log(`Server started on port ${port}`);
+});

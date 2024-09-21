@@ -1,9 +1,12 @@
 import Navbar from './Navbar';
 import { useState } from 'react';
+import { useNavigate } from 'react-router-dom'; 
 import SellerDetailModal from './Seller_modal';
+
 const SellerCards = () => {
   const [selectedSeller, setSelectedSeller] = useState(null); 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   const sellers = [
     {
@@ -25,11 +28,30 @@ const SellerCards = () => {
     setSelectedSeller(null);
   };
 
+  const handleCreateNew = () => {
+    const isLoggedIn = localStorage.getItem('isLoggedIn');
+
+    if (isLoggedIn) {
+      navigate('/form'); 
+    } else {
+      navigate('/login');
+    }
+  };
+
   return (
     <div>
       <Navbar />
       <div className="px-4 py-8">
-        <h1 className="text-2xl font-semibold mb-4 p-4">Seller</h1>
+        <div className="flex justify-between items-center mb-4 p-4">
+          <h1 className="text-2xl font-semibold">Seller</h1>
+          <button
+            className="bg-blue-500 text-white px-4 py-2 rounded animate-pulse" // Add blinking animation
+            onClick={handleCreateNew}
+          >
+            Create New
+          </button>
+        </div>
+
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6">
           {sellers.map((seller, index) => (
             <div
@@ -59,7 +81,6 @@ const SellerCards = () => {
         </div>
       </div>
 
-      {/* Modal for Seller Details */}
       <SellerDetailModal
         seller={selectedSeller}
         isOpen={isModalOpen}

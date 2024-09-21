@@ -51,7 +51,7 @@ function Login() {
             </div>
           </div>
 
-          <button className="w-full bg-[#089B7D] text-white py-2 rounded-md shadow-md hover:bg-green-700 focus:outline-none">
+          <button className="w-full bg-[#089B7D] opacity-100 text-white py-2 rounded-md shadow-md hover:bg-[#089B7D] hover:opacity-80 hover:scale-95  focus:outline-none">
             <span className="flex items-center justify-center">
               <AiOutlineLogin className="mr-2" /> Login
             </span>

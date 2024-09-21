@@ -3,6 +3,7 @@ import Seller from './components/Seller';
 import Buyer from './components/Buyer';
 import Home from './components/Home';
 import Login from './components/Login'
+import Register from './components/Register';
 function App() {
   return (
     <>
@@ -11,6 +12,7 @@ function App() {
         <Route path="/seller" element={<Seller />} />
         <Route path='/Buyer' element={<Buyer />} />
         <Route path='/login' element={<Login />} />
+        <Route path='/register' element={<Register />} />
       </Routes>
         
     </>
