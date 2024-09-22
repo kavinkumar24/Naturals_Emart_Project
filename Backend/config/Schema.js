@@ -13,19 +13,27 @@ const userSchema = new mongoose.Schema({
     phone: {
         type: String,
         required: true,
+        unique: true
     },
     password: {
         type: String,
         required: true,
     },
-    otp: {
-        type: String,
-        required: false,
-    },
+  
     isVerified: {
         type: Boolean,
         default: false,
-    }
+    },
+    products: [{
+        title: String,
+        description: String,
+        category: String,
+        organic: Boolean,
+        images: [String],
+        size: String,
+        price: Number,
+        status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+    }],
 });
 
 

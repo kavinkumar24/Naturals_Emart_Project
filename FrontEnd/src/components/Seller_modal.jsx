@@ -4,7 +4,7 @@ import { BsHandbag } from "react-icons/bs";
 import { PiPlantLight } from "react-icons/pi";
 import { CiLocationOn, CiUser } from "react-icons/ci";
 import { MdOutlineCategory, MdOutlineDescription, MdOutlineCurrencyRupee } from "react-icons/md";
-import "react-responsive-carousel/lib/styles/carousel.min.css"; // Carousel styles
+import "react-responsive-carousel/lib/styles/carousel.min.css"; 
 
 const SellerDetailModal = ({ seller, isOpen, onClose }) => {
   if (!isOpen) return null;
