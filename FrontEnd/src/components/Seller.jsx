@@ -2,10 +2,12 @@ import Navbar from './Navbar';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import SellerDetailModal from './Seller_modal';
+import SaleOptionModal from './Seller_type_modal'; // Import the new modal
 
 const SellerCards = () => {
   const [selectedSeller, setSelectedSeller] = useState(null); 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isSaleModalOpen, setIsSaleModalOpen] = useState(false); // State for sale option modal
   const navigate = useNavigate();
 
   const sellers = [
@@ -29,12 +31,15 @@ const SellerCards = () => {
   };
 
   const handleCreateNew = () => {
-    const isLoggedIn = localStorage.getItem('isLoggedIn');
+    setIsSaleModalOpen(true); // Open the sale option modal
+  };
 
-    if (isLoggedIn) {
-      navigate('/form'); 
-    } else {
-      navigate('/login');
+  const handleSaleOptionSelect = (option) => {
+    setIsSaleModalOpen(false); // Close sale option modal
+    if (option === 'one_time_sale') {
+      navigate('/one_time_sell_form'); 
+    } else if (option === 'regular_sale') {
+      navigate('/regular_sell_form'); 
     }
   };
 
@@ -81,10 +86,16 @@ const SellerCards = () => {
         </div>
       </div>
 
+      {/* Modals */}
       <SellerDetailModal
         seller={selectedSeller}
         isOpen={isModalOpen}
         onClose={closeModal}
+      />
+      <SaleOptionModal
+        isOpen={isSaleModalOpen}
+        onClose={() => setIsSaleModalOpen(false)}
+        onSelectOption={handleSaleOptionSelect}
       />
     </div>
   );

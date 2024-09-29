@@ -1,14 +1,9 @@
 const mongoose = require('mongoose');
 
-
 const userSchema = new mongoose.Schema({
     name: {
         type: String,
         required: true,
-    },
-    email: {
-        type: String,
-        required: false,
     },
     phone: {
         type: String,
@@ -19,9 +14,8 @@ const userSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
-  
     isVerified: {
-        type: Boolean,
+        type: Boolean,  
         default: false,
     },
     products: [{
@@ -33,9 +27,9 @@ const userSchema = new mongoose.Schema({
         size: String,
         price: Number,
         status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
+        saleType:  String
     }],
 });
-
 
 const User = mongoose.model('User', userSchema);
 

@@ -6,6 +6,7 @@ import logo from '../assests/website_logo.jpg';
 import { ImSearch } from 'react-icons/im';
 import { useNavigate } from "react-router";
 import { AiOutlineLogin } from 'react-icons/ai';
+
 function Navbar() {
   const navigate = useNavigate();
   const [showMenu, setShowMenu] = useState(false);
@@ -14,13 +15,18 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false); // Modal state
   const [products, setProducts] = useState([]);
+
+
+
+
   useEffect(() => {
     const isLoggedIn = localStorage.getItem('isLoggedIn');
     if (isLoggedIn === 'true') {
       const userData = JSON.parse(localStorage.getItem('userData'));
       setUser(userData);
       console.log('User data:', userData);
-
+      
+    
       // Fetch products from API
       const fetchProducts = async () => {
         try {
@@ -82,6 +88,9 @@ function Navbar() {
           </div>
         </div>
       </div>}
+
+      
+
 
       <img src={logo} alt="logo" className="w-32 h-32 mt-5 object-cover object-center" />
 
@@ -193,16 +202,30 @@ function Navbar() {
             <div className="mt-4">
                 <h3 className="text-lg font-semibold mb-2">Products</h3>
                 {products.length > 0 ? (
-                <ul>
-                  {products.map((product) => (
-                    <li key={product._id} className="mb-2">
-                      <strong>{product.title}</strong>: {product.description} - Rs.{product.price}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No products found for this user.</p>
-              )}
+    <ul>
+      {products.map((product) => (
+        <li key={product._id} className="mb-2 flex justify-between items-center">
+          <div>
+            <strong>{product.title}</strong>: {product.description} - Rs.{product.price}
+          </div>
+          <img 
+    src={product.images && product.images.length > 0 ? product.images[0] : 'fallback_image_url'} 
+    alt={product.title} 
+    className="w-10 h-10 object-cover rounded-md" 
+/>
+<img 
+    src={product.images && product.images.length > 0 ? product.images[1] : 'fallback_image_url'} 
+    alt={product.title} 
+    className="w-10 h-10 object-cover rounded-md" 
+/>
+
+        </li>
+      ))}
+    </ul>
+) : (
+    <p>No products found for this user.</p>
+)}
+
             </div>
 
             <div className="flex justify-between mt-4">

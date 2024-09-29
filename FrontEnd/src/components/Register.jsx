@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { AiOutlineUser, AiOutlineMail, AiOutlinePhone, AiOutlineLock, AiOutlineCheck } from "react-icons/ai";
 import Navbar from "./Navbar";
 import axios from "axios";
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -51,10 +53,13 @@ function Register() {
     try {
       const response = await axios.post("http://localhost:5000/api/register", formData);
       setIsSuccess(true);
-      alert(response.data.message);
+      toast.success(response.data.message); // Show success toast
     } catch (error) {
       console.error("Error registering user:", error.response || error.message);
       setErrorMessage(error.response?.data.message || "An error occurred. Please try again.");
+      if (error.response?.status === 400) {
+        toast.error(error.response.data.message); // Show error toast for existing mobile number
+      }
     } finally {
       setIsSubmitting(false);
     }
@@ -64,14 +69,14 @@ function Register() {
     <div>
       <Navbar />
       <div className="min-h-screen flex justify-center items-center bg-white p-4">
-        <div className="bg-zinc-100 p-6 rounded-lg shadow-md max-w-md w-full -mt-44 md:mt-0"> {/* Adjusted max-w */}
-        {isSuccess ? (
-  <div className="flex justify-center mb-4">
-    <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center animate-pulse">
-      <AiOutlineCheck className="text-white text-3xl" />
-    </div>
-      <p>Registered successfully please login to continue</p>
-  </div>
+        <div className="bg-zinc-100 p-6 rounded-lg shadow-md max-w-md w-full -mt-44 md:mt-0">
+          {isSuccess ? (
+            <div className="flex justify-center mb-4">
+              <div className="w-12 h-12 rounded-full bg-green-500 flex items-center justify-center animate-pulse">
+                <AiOutlineCheck className="text-white text-3xl" />
+              </div>
+              <p>Registered successfully! Please login to continue.</p>
+            </div>
           ) : (
             <>
               <h2 className="text-2xl font-bold text-center mb-6">Register / பதிவு</h2>
@@ -80,7 +85,7 @@ function Register() {
                 <div className="h-1 bg-blue-500 transition-all duration-300 mb-4"></div>
               )}
               <form onSubmit={handleSubmit}>
-                {["name", "email", "phone", "password", "confirmpassword"].map((field) => (
+                {["name", "phone", "password", "confirmpassword"].map((field) => (
                   <div className="mb-4" key={field}>
                     <label className="block text-gray-700 text-sm mb-2" htmlFor={field}>
                       {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
@@ -115,6 +120,7 @@ function Register() {
           </p>
         </div>
       </div>
+      <ToastContainer /> 
     </div>
   );
 }

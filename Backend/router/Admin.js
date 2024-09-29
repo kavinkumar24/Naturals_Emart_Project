@@ -1,69 +1,144 @@
 const express = require("express");
 const router = express.Router();
-const Product = require("../config/model/Product"); 
+const ProductRequest = require("../config/model/Product");
 const User = require("../config/Schema");
-const ProductRequest = require('../config/model/Product');
+const RegularProductRequest = require("../config/model/Regular_Product");
+
+// Get all product requests
 
 
-router.get("/admin/requests", async (req, res) => {
-    console.log("GET request for product requests received");
+
+// Fetch and test RegularProductRequest
+// Check regular product requests
+router.get("/admin/test-regular-requests", async (req, res) => {
     try {
-        const productRequests = await ProductRequest.find(); 
-        res.status(200).json({ message: "Product requests fetched successfully", productRequests });
+        const regularProductRequests = await RegularProductRequest.find().populate('name', 'phone').lean();
+        console.log("Regular Product Requests:", regularProductRequests);
+        res.status(200).json(regularProductRequests);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error fetching regular product requests", error });
+    }
+});
+
+// Fetch and test ProductRequest
+router.get("/admin/test-product-requests", async (req, res) => {
+    try {
+        const productRequests = await ProductRequest.find().populate('name', 'phone').lean();
+        console.log("Product Requests:", productRequests);
+        res.status(200).json(productRequests);
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error fetching product requests", error });
     }
 });
-router.post('/admin/approve', async (req, res) => {
-    const { requestId, status } = req.body;
+
+// Combined endpoint to fetch and merge both requests
+router.get("/admin/requests", async (req, res) => {
+    console.log("GET request for combined product requests received");
+    try {
+        const [productRequests, regularProductRequests] = await Promise.all([
+            ProductRequest.find().populate('name', 'phone').lean(),
+            RegularProductRequest.find().populate('name', 'phone').lean()
+        ]);
+
+        console.log("Product Requests:", productRequests);
+        console.log("Regular Product Requests:", regularProductRequests);
+        console.log("Number of Regular Product Requests:", regularProductRequests.length);
+
+        // Combine the results
+        const allRequests = [...productRequests, ...regularProductRequests];
+
+        console.log("All Combined Requests:", allRequests); // Debugging combined requests
+
+        res.status(200).json({
+            message: "Product requests fetched successfully",
+            productRequests: allRequests
+        });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({
+            message: "Error fetching product requests",
+            error
+        });
+    }
+});
+
+
+
+
+
+
+
+
+// Approve or reject a product request
+router.post("/admin/approve", async (req, res) => {
+    const { id, status, phone, title, description, category } = req.body;
+
     console.log('POST request to update product request status received');
-    console.log('Request ID:', requestId);
+    console.log('Request ID:', id);
     console.log('Status:', status);
+    console.log('Phone:', phone);
+
+    if (!id || !status) {
+        return res.status(400).json({ message: 'Missing required fields: id or status' });
+    }
 
     try {
-        // Find the product request by its ID
-        const productRequest = await ProductRequest.findById(requestId);
+        // Handle removal
+        if (status === 'removed') {
+            const result = await ProductRequest.deleteOne({ _id: id });
+            if (result.deletedCount === 0) {
+                return res.status(404).json({ message: 'Product request not found' });
+            }
+            console.log('Product request removed:', id);
+            return res.status(200).json({ message: 'Product request removed successfully' });
+        }
+
+        // For approvals
+        const productRequest = await ProductRequest.findById(id);
+        console.log('Product request found:', productRequest);
+
         if (!productRequest) {
             return res.status(404).json({ message: 'Product request not found' });
         }
 
-        // Find the user by mobile number (assuming productRequest contains the phone)
-        const user = await User.findOne({ phone: productRequest.phone });
+        // Allow approval if it's currently pending
+        if (productRequest.status !== 'pending') {
+            return res.status(400).json({ message: 'Product request cannot be modified' });
+        }
+
+        // Update details if provided
+        if (title) productRequest.title = title;
+        if (description) productRequest.description = description;
+        if (category) productRequest.category = category;
+
+        // Update status to approved
+        productRequest.status = status; 
+        await productRequest.save();
+
+        console.log('Product request approved:', productRequest);
+
+        const user = await User.findOne({ phone });
         console.log('User found:', user);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
+        if (user) {
+            user.products.push({
+                title: productRequest.title,
+                description: productRequest.description,
+                category: productRequest.category,
+                organic: productRequest.organic,
+                images: productRequest.images,
+                size: productRequest.size,
+                price: productRequest.price,
+                status: status,
+                saleType: productRequest.saleType
+
+            });
+            await user.save();
+            console.log('Product added to user:', user);
         }
 
-        // Check if the user already has 5 approved products
-        if (user.products.length >= 5) {
-            return res.status(400).json({ message: 'User already has 5 approved products' });
-        }
-
-        // Create the approved product object
-        const approvedProduct = {
-            title: productRequest.title,
-            description: productRequest.description,
-            category: productRequest.category,
-            organic: productRequest.organic,
-            images: productRequest.images,
-            size: productRequest.size,
-            price: productRequest.price,
-            status: 'approved'
-        };
-
-        // Add the approved product to the user's products array
-        user.products.push(approvedProduct);
-        console.log('Approved product added:', approvedProduct);
-
-        // Optionally, you can remove the request after approving it
-        // await ProductRequest.deleteOne({ _id: requestId });
-
-        // Save the updated user document
-        const updatedUser = await user.save();
-        console.log('User updated successfully:', updatedUser);
-
-        res.status(200).json({ message: 'Product request approved and stored successfully', product: approvedProduct });
+        res.status(200).json({ message: 'Product request status updated successfully' });
     } catch (error) {
         console.error('Error updating product request:', error);
         res.status(500).json({ message: 'Error updating product request status', error });
@@ -71,8 +146,77 @@ router.post('/admin/approve', async (req, res) => {
 });
 
 
+// Approve or reject a product request
+router.post("/admin/approve_regular", async (req, res) => {
+    const { id, status, phone, title, description, category } = req.body;
 
+    console.log('POST request to update product request status received');
+    console.log('Request ID:', id);
+    console.log('Status:', status);
+    console.log('Phone:', phone);
+
+    if (!id || !status) {
+        return res.status(400).json({ message: 'Missing required fields: id or status' });
+    }
+
+    try {
+        // Handle removal
+        if (status === 'removed') {
+            const result = await RegularProductRequest.deleteOne({ _id: id });
+            if (result.deletedCount === 0) {
+                return res.status(404).json({ message: 'Product request not found' });
+            }
+            console.log('Product request removed:', id);
+            return res.status(200).json({ message: 'Product request removed successfully' });
+        }
+
+        // For approvals
+        const productRequest = await RegularProductRequest.findById(id);
+        console.log('Product request found:', productRequest);
+
+        if (!productRequest) {
+            return res.status(404).json({ message: 'Product request not found' });
+        }
+
+        // Allow approval if it's currently pending
+        if (productRequest.status !== 'pending') {
+            return res.status(400).json({ message: 'Product request cannot be modified' });
+        }
+
+        // Update details if provided
+        if (title) productRequest.title = title;
+        if (description) productRequest.description = description;
+        if (category) productRequest.category = category;
+
+        // Update status to approved
+        productRequest.status = status; 
+        await productRequest.save();
+
+        console.log('Product request approved:', productRequest);
+
+        const user = await User.findOne({ phone });
+        console.log('User found:', user);
+        if (user) {
+            user.products.push({
+                title: productRequest.title,
+                description: productRequest.description,
+                category: productRequest.category,
+                organic: productRequest.organic,
+                images: productRequest.images,
+                price: productRequest.price,
+                status: status,
+                saleType: productRequest.saleType
+            });
+            await user.save();
+            console.log('Product added to user:', user);
+        }
+
+        res.status(200).json({ message: 'Product request status updated successfully' });
+    } catch (error) {
+        console.error('Error updating product request:', error);
+        res.status(500).json({ message: 'Error updating product request status', error });
+    }
+});
 
 
 module.exports = router;
-

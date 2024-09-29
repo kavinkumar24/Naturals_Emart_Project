@@ -8,11 +8,11 @@ function Login() {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const [user, setUser] = useState(null); 
+  const [user, setUser] = useState(null);
   const [products, setProducts] = useState([]);
 
   const handleLogin = async () => {
-    setIsLoading(true); 
+    setIsLoading(true);
     try {
       const response = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
@@ -24,46 +24,68 @@ function Login() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        alert(errorData.message); 
-        setIsLoading(false); 
+        // alert(errorData.message);
+        setIsLoading(false);
         return;
       }
 
       const data = await response.json();
       console.log('Login response:', data);
-      // Save user data and login state to localStorage
-      setUser(data.user);
-      localStorage.setItem('isLoggedIn', 'true'); // Save login state
-      localStorage.setItem('userData', JSON.stringify(data.user)); // Save user data
-      
+
+      // Check if token exists
+      if (data.token) {
+        // Save user data and login state to localStorage
+        setUser(data.user);
+        localStorage.setItem('isLoggedIn', 'true'); // Save login state
+        localStorage.setItem('userData', JSON.stringify(data.user)); // Save user data
+        localStorage.setItem('token', data.token); // Save the JWT token
+        console.log('Token saved to localStorage:', localStorage.getItem('token'));
+      } else {
+        console.error('Token is undefined');
+      }
+
       alert(data.message); // Display success message
-      fetchProducts(data.user.phone);
-      navigate('/form'); // Redirect to the form page
+
+      // Fetch products after successful login
+      fetchProducts(data.user.phone, data.token);
+
+      navigate('/one_time_sell_form'); // Redirect to the form page
     } catch (error) {
       console.error('Login error:', error);
       alert('An error occurred while logging in. Please try again.');
+    } finally {
       setIsLoading(false); // Stop loading animation
     }
   };
 
-  const fetchProducts = async (phone) => {
+  const fetchProducts = async (phone, token) => {
     try {
-        const response = await fetch(`http://localhost:5000/api/Seller/${phone}`);
-        if (!response.ok) {
-            const errorData = await response.json();
-            alert(errorData.message);
-            return;
+      const response = await fetch(`http://localhost:5000/api/Seller/${phone}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}` // Include the JWT token in the Authorization header
         }
+      });
 
-        const data = await response.json();
-        console.log('Fetched products:', data.products);
-        setProducts(data.products); // Store the products in the state to display in modal
-        localStorage.setItem('products', JSON.stringify(data.products)); // Save products to localStorage
+      if (!response.ok) {
+        const errorData = await response.json();
+        // alert(errorData.message);
+        return;
+      }
+
+      const data = await response.json();
+      console.log('Fetched products:', data.products);
+
+      // Store the products in the state to display in the modal
+      setProducts(data.products);
+
+      // Save products to localStorage
+      localStorage.setItem('products', JSON.stringify(data.products));
     } catch (error) {
-        console.error('Error fetching products:', error);
+      console.error('Error fetching products:', error);
     }
+  };
 
-  }
   return (
     <div>
       <Navbar user={user} />
