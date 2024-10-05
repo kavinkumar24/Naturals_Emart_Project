@@ -7,9 +7,11 @@
     const admin = require('../router/Admin');
     const User = require('../router/User');
     const app = express();
-    const port = 5000;
-
-
+    const port = 8200;
+    app.get('/', (req, res) => {
+        res.send('Hello World!');
+    });
+    
     connectToDb();
 
     // Middleware
