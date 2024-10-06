@@ -4,12 +4,14 @@ import Navbar from "./Navbar";
 import axios from "axios";
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { PiAddressBook } from "react-icons/pi";
 
 function Register() {
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
+    address: "",
     password: "",
     confirmpassword: ""
   });
@@ -85,7 +87,7 @@ function Register() {
                 <div className="h-1 bg-blue-500 transition-all duration-300 mb-4"></div>
               )}
               <form onSubmit={handleSubmit}>
-                {["name", "phone", "password", "confirmpassword"].map((field) => (
+                {["name", "phone","address", "password", "confirmpassword"].map((field) => (
                   <div className="mb-4" key={field}>
                     <label className="block text-gray-700 text-sm mb-2" htmlFor={field}>
                       {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
@@ -100,7 +102,12 @@ function Register() {
                         className="appearance-none w-full bg-transparent outline-none border-none focus:outline-none"
                       />
                       <span className="text-gray-500 ml-2">
-                        {field === "name" ? <AiOutlineUser /> : field === "email" ? <AiOutlineMail /> : field === "phone" ? <AiOutlinePhone /> : <AiOutlineLock />}
+                        {field === "name" ? <AiOutlineUser /> : field === "email" ? <AiOutlineMail /> : field === "phone" ? <AiOutlinePhone /> :
+                        field === "address" ? <PiAddressBook />
+                        : <AiOutlineLock />
+
+                        
+                        }
                       </span>
                     </div>
                   </div>

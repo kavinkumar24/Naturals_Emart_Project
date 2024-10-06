@@ -12,10 +12,7 @@ if (!DB) {
 
 const connectToDb = async () => {
     try {
-        await mongoose.connect(DB, {
-            useNewUrlParser: true, 
-            useUnifiedTopology: true, 
-        });
+        await mongoose.connect(DB, {});
         console.log("Connected to DB");
     } catch (err) {
         console.error("Failed to connect to DB:", err);

@@ -7,6 +7,7 @@ import { FaCircleNotch,FaBusinessTime } from "react-icons/fa";
 import { FiArrowDown} from "react-icons/fi";
 import "./Styles/home.css";
 import { useNavigate } from "react-router";
+import Load from "./Loading/Load";
 function Home() {
   const navigate = useNavigate();
   const[load,setLoad] = useState(false);
@@ -25,55 +26,8 @@ function Home() {
 
   return (
     <div className="w-[100%] min-h-screen overflow-auto bg-slate-100">
-    {load && <div className={`border fixed shadow rounded-md p-4 max-w-full min-h-full inset-0 z-50 w-full md:w-[100%]  ml-0  mx-auto ${theme === 'dark' ? 'bg-gray-800 border-blue-300 ' : 'bg-white border-gray-200'} sm:ml-0`} >
-    <div className="animate-pulse flex space-x-4 mt-16">
-  <div className={`rounded-fullh-10 w-10`}></div>
-  <div className="flex-1 space-y-6 py-10 md:py-1">
-    <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-    <div className="space-y-5 md:space-y-3">
-      <div className="grid grid-cols-3 gap-4">
-        <div className={`h-2 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded col-span-2`}></div>
-        <div className={`h-2 w-[70%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded col-span-1`}></div>
-      </div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className="grid grid-cols-3 gap-4">
-      <div className={`h-2 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2  ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      </div>
-      
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className="grid grid-cols-3 gap-4">
-      <div className={`h-2  ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      
-      </div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className="grid grid-cols-3 gap-4">
-      <div className={`h-2 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2  ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      </div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2 w-[90%] ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className="grid grid-cols-3 gap-4">
-      <div className={`h-2 ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      <div className={`h-2  ${theme === 'dark' ? 'bg-slate-700' : 'bg-slate-200'} rounded`}></div>
-      </div>
-    </div>
-    
-  </div>
-</div>
-</div>
+    {load && 
+    <Load />
 }
     <div
       className={`  md:min-h-screen lg:min-h-screen relative h-[40%] sm:h-12 lg:h-full shadow-md ${
@@ -152,12 +106,14 @@ function Home() {
 
         </div>
 
-        <div className="md:w-1/2 relative mt-12 md:mt-0 flex justify-center md:justify-end z-10 shadow-xl md:visible">
-          <img
-            src={Grains}
-            alt="Salad"
-            className="absolute left-0 top-1/2 transform -translate-y-1/2 w-50 h-50 md:w-96 md:h-96 object-cover rounded-full z-10 shadow-xl transition-transform duration-300 ease-in-out hover:scale-110 hover:shadow-2xl hover:rotate-12 hover:translate-x-9"
-          />
+
+        <div className="md:w-1/2 relative mt-12 md:mt-0 flex justify-center md:justify-end shadow-xl md:visible">
+  <img
+    src={Grains}
+    alt="Salad"
+    className="absolute left-0 top-1/2 transform -translate-y-1/2 w-50 h-50 md:w-96 md:h-96 object-cover rounded-full -z-[2px] shadow-xl transition-transform duration-300 ease-in-out hover:scale-110 hover:shadow-2xl hover:rotate-12 hover:translate-x-9"
+  />
+       
         </div>
       </div>
       

@@ -6,8 +6,10 @@
     const seller = require('../router/Seller');
     const admin = require('../router/Admin');
     const User = require('../router/User');
+    const buyerform = require('../router/Buyer')
     const app = express();
-    const port = 8200;
+
+    const port = 5000;
     app.get('/', (req, res) => {
         res.send('Hello World!');
     });
@@ -19,9 +21,10 @@
     app.use(cors());
 
 
-    app.use('/api', registerRoute);
+    app.use('/  ', registerRoute);
     app.use('/api', loginRoute);
     app.use('/api', seller);
+    app.use('/api', buyerform);
     app.use('/api', admin);
     app.use('/api', User);
 

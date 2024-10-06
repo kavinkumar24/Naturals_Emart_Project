@@ -18,6 +18,10 @@ const userSchema = new mongoose.Schema({
         type: Boolean,  
         default: false,
     },
+    address: {
+        type: String,
+        required: true,
+    },
     products: [{
         title: String,
         description: String,
