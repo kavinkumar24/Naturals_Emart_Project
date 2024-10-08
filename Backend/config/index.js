@@ -7,6 +7,7 @@
     const admin = require('../router/Admin');
     const User = require('../router/User');
     const buyerform = require('../router/Buyer')
+    const GET_seller = require('../router/Get_Seller');
     const app = express();
 
     const port = 5000;
@@ -22,6 +23,7 @@
 
 
     app.use('/  ', registerRoute);
+    app.use("/api", GET_seller);
     app.use('/api', loginRoute);
     app.use('/api', seller);
     app.use('/api', buyerform);

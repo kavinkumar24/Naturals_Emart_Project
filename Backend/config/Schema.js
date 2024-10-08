@@ -31,7 +31,9 @@ const userSchema = new mongoose.Schema({
         size: String,
         price: Number,
         status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
-        saleType:  String
+        saleType:  String,
+        unique_id: Number,
+        Approved_at: { type: Date, default: null },
     }],
 });
 

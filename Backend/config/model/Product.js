@@ -4,6 +4,7 @@ const ProductRequestSchema = new mongoose.Schema({
     title: String,
     description: String,
     category: String,
+    category_comes: String,
     images: [String],
     size: String,
     price: Number,

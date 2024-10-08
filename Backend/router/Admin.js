@@ -90,6 +90,19 @@ router.post("/admin/approve", async (req, res) => {
     try {
         // Handle removal
         if (status === 'removed') {
+            const productRequest = await ProductRequest.findById(id);
+            if (!productRequest) {
+                return res.status(404).json({ message: 'Product request not found' });
+            }
+
+            // Find the user and remove the product from their products array
+            const user = await User.findOne({ phone });
+            if (user) {
+                user.products = user.products.filter(product => product.title !== productRequest.title);
+                await user.save();
+                console.log('Product removed from user:', user);
+            }
+
             const result = await ProductRequest.deleteOne({ _id: id });
             if (result.deletedCount === 0) {
                 return res.status(404).json({ message: 'Product request not found' });
@@ -129,7 +142,8 @@ router.post("/admin/approve", async (req, res) => {
                 size: productRequest.size,
                 price: productRequest.price,
                 status: productRequest.status,
-                saleType: productRequest.saleType
+                saleType: productRequest.saleType,
+                Approved_at: new Date()
             });
             await user.save();
             console.log('Product added to user:', user);
@@ -141,6 +155,7 @@ router.post("/admin/approve", async (req, res) => {
         res.status(500).json({ message: 'Error updating product request status', error });
     }
 });
+
 
 
 
@@ -231,7 +246,7 @@ router.post("/admin/approve_regular", async (req, res) => {
 });
 
 router.post("/admin/approve_buyer", async (req, res) => {
-    const { id, status, phone, title, description, category } = req.body;
+    const { id, status, phone, title, description, category, unique_id } = req.body;
 
     console.log('POST request to update product request status received');
     console.log('Request ID:', id);
@@ -289,7 +304,8 @@ router.post("/admin/approve_buyer", async (req, res) => {
                 size: productRequest.size,
                 price: productRequest.price,
                 status: status,
-                saleType: productRequest.saleType
+                saleType: productRequest.saleType,
+                unique_id: productRequest.unique_id
             });
             await user.save();
             console.log('Product added to user:', user);

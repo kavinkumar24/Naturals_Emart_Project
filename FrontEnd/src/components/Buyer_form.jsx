@@ -18,6 +18,7 @@ const Buyerform = () => {
         name: "",
         phone: "",
         address: "",
+        unique_id:"",
     });
     const [user, setUser] = useState(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -93,6 +94,7 @@ const [previewData, setPreviewData] = useState({});
             name: data.name,
             phone: data.phone,
             address: data.address,
+            unique_id:data.unique_id,
           });
           
           console.log(userData_)
@@ -178,6 +180,7 @@ const [previewData, setPreviewData] = useState({});
     formData.append('name', userData_.name);
     formData.append('phone', userData_.phone);
     formData.append('address', userData_.address);
+    // formData.append('unique_id', unique_id); 
 
     // Append image files to formData
     imageFiles.forEach(file => {

@@ -14,6 +14,7 @@
     const [images, setImages] = useState([]);
     const fileInputRef = useRef(null);
     const [selectedCategory, setSelectedCategory] = useState(null);
+    const[selected_category_comes, setSelectedCategoryComes] = useState(null);
     const [imageFiles, setImageFiles] = useState([]);
 
 
@@ -44,7 +45,7 @@
       fileInputRef.current.value = "";
     };
 
-    const category = [
+    const category_comes = [
       "உணவு பொருட்கள்",
       "விளை பொருட்கள்",
       "இடு பொருட்கள்",
@@ -85,7 +86,7 @@
       'ENT',
       'Farmer',
     ]
-    const categoryOptions = category.map((item) => ({ value: item, label: item }));
+    const categoryOptions = category_comes.map((item) => ({ value: item, label: item }));
     const category_select_options = select_options.map((item) => ({ value: item, label: item }));
 
     const handleSubmit = async (event) => {
@@ -112,6 +113,7 @@
       const formData = new FormData();
       formData.append('title', event.target.title.value);
       formData.append('description', event.target.description.value);
+      formData.append('category_comes', selected_category_comes ? selected_category_comes.value : '');
       formData.append('category', selectedCategory ? selectedCategory.value : '');
       formData.append('organic', organic);
       formData.append('size', event.target.size.value);
@@ -180,7 +182,7 @@
           className="w-full"
           placeholder="Select an option"
           isSearchable
-          onChange={option => setSelectedCategory(option)}
+          onChange={option => setSelectedCategoryComes(option)}
 
         />
             </div>
