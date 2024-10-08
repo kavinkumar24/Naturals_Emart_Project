@@ -1,6 +1,7 @@
 // In your Register.js file
 const express = require('express');
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcryptjs');
+
 const User = require('../config/Schema');
 const router = express.Router();
 
