@@ -15,35 +15,37 @@ import PrivateRoute from './components/Privateroute';
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
-  // Check local storage for admin login status on component mount
   useEffect(() => {
     const adminIsLoggedIn = localStorage.getItem('adminIsLoggedIn');
-    setIsAuthenticated(adminIsLoggedIn === 'true'); // Directly set authentication state
+    setIsAuthenticated(adminIsLoggedIn === 'true');
   }, []);
 
   const handleLogin = () => {
     setIsAuthenticated(true);
-    localStorage.setItem('adminIsLoggedIn', 'true'); // Set local storage when logging in
+    localStorage.setItem('adminIsLoggedIn', 'true');
     console.log('Admin logged in');
   };
 
   const handleLogout = () => {
     setIsAuthenticated(false);
-    localStorage.removeItem('adminIsLoggedIn'); // Clear the local storage on logout
+    localStorage.removeItem('adminIsLoggedIn');
   };
+
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; // Check for user login status
 
   return (
     <>
       <Routes>
         <Route path='/' element={<Home />} />
         <Route path="/seller" element={<Seller />} />
-        <Route path='/Buyer' element={<Buyer />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/register' element={<Register />} />
+        <Route path='/buyer' element={<Buyer />} />
+        
+        {/* Conditional rendering for login and register routes */}
+        <Route path='/login' element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+        <Route path='/register' element={isLoggedIn ? <Navigate to="/" /> : <Register />} />
         
         <Route path='/admin/login' element={<AdminLogin onLogin={handleLogin} />} />
         
-        {/* Admin route, protected by authentication check */}
         <Route path='/admin' element={isAuthenticated ? <Admin_page onLogout={handleLogout} /> : <Navigate to="/admin/login" />} />
         <Route path='/one_time_sell_form' element={<PrivateRoute element={<Seller_Form />} />} />
         <Route path='/regular_sell_form' element={<PrivateRoute element={<Seller_regular />} />} />
