@@ -68,7 +68,7 @@ function Register() {
 
     try {
       const response = await axios.post(
-        "http://localhost:5000/api/register",
+        "https://naturals-emart-project.onrender.com/api/register",
         formData
       );
       setIsSuccess(true);
