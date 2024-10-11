@@ -26,7 +26,7 @@ function Home() {
   useEffect(() => {
     const fetchSellers = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/sellers");
+        const response = await fetch("https://naturals-emart-project.onrender.com/api/sellers");
         const sellers = await response.json();
 
         // Count categories
