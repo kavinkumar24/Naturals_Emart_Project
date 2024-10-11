@@ -23,39 +23,65 @@ const ProductForm = () => {
   });
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
-    if (isLoggedIn === "true") {
-      const userData = JSON.parse(localStorage.getItem("userData"));
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    const userId = userData.user_id; // Assuming you have a user_id in userData
 
-      console.log("User data:", userData);
-
-      // Fetch products from API
-      const fetchProducts = async () => {
+    if (userId) {
+      // Fetch user login status from API
+      const checkLoginStatus = async () => {
         try {
           const response = await fetch(
-            `https://naturals-emart-project.onrender.com/api/user/${userData.phone}`
+            `https://naturals-emart-project.onrender.com/api/usersession/${userId}`
           );
           if (!response.ok) {
             throw new Error("Network response was not ok");
           }
-          const data = await response.json();
-          setUserData({
-            name: data.name,
-            phone: data.phone,
-            address: data.address,
-            unique_id: data.unique_id,
-          });
+          const { isLoggedIn } = await response.json();
+  
+          if (isLoggedIn) {
+            const userData = JSON.parse(localStorage.getItem("userData"));
+            console.log("User data:", userData);
+            
+  
+            // Fetch products from API
+            const fetchProducts = async () => {
+              try {
+                const productResponse = await fetch(
+                  `https://naturals-emart-project.onrender.com/api/user/${userData.phone}`
+                );
+                if (!productResponse.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                const data = await productResponse.json();
+                setUserData({
+                  name: data.name,
+                  phone: data.phone,
+                  address: data.address,
+                  unique_id: data.unique_id,
+                });
 
-          console.log(userData_);
-          console.log("Product data:", data.products);
+                console.log("jjjj",userData_)
+  
+                console.log("Product data:", data.products);
+              } catch (error) {
+                console.error("Failed to fetch products:", error);
+              }
+            };
+  
+            fetchProducts();
+          } else {
+            console.log("User is not logged in");
+            // Handle not logged in state (e.g., redirect to login)
+          }
         } catch (error) {
-          console.error("Failed to fetch products:", error);
+          console.error("Failed to check login status:", error);
         }
       };
-
-      fetchProducts();
+  
+      checkLoginStatus();
     }
   }, []);
+  
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));

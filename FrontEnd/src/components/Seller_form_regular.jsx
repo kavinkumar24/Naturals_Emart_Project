@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import Navbar from "./Navbar";
 import Select from "react-select";
 import { useState } from "react";
@@ -9,6 +9,13 @@ const ProductForm = () => {
   const navigate = useNavigate();
   const [images, setImages] = useState([]);
   const [imageFiles, setImageFiles] = useState([]); // State to store the actual image files
+  const [isloading, setIsLoading] = useState(false);
+  const [userData_, setUserData] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    unique_id: "",
+  });
   const fileInputRef = useRef(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
 
@@ -85,9 +92,71 @@ const ProductForm = () => {
     label: item,
   }));
 
+
+
+  useEffect(() => {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    const userId = userData.user_id; // Assuming you have a user_id in userData
+
+    if (userId) {
+      // Fetch user login status from API
+      const checkLoginStatus = async () => {
+        try {
+          const response = await fetch(
+            `https://naturals-emart-project.onrender.com/api/usersession/${userId}`
+          );
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const { isLoggedIn } = await response.json();
+  
+          if (isLoggedIn) {
+            const userData = JSON.parse(localStorage.getItem("userData"));
+            console.log("User data:", userData);
+            
+  
+            // Fetch products from API
+            const fetchProducts = async () => {
+              try {
+                const productResponse = await fetch(
+                  `https://naturals-emart-project.onrender.com/api/user/${userData.phone}`
+                );
+                if (!productResponse.ok) {
+                  throw new Error("Network response was not ok");
+                }
+                const data = await productResponse.json();
+                setUserData({
+                  name: data.name,
+                  phone: data.phone,
+                  address: data.address,
+                  unique_id: data.unique_id,
+                });
+
+                console.log("jjjj",userData_)
+  
+                console.log("Product data:", data.products);
+              } catch (error) {
+                console.error("Failed to fetch products:", error);
+              }
+            };
+  
+            fetchProducts();
+          } else {
+            console.log("User is not logged in");
+            // Handle not logged in state (e.g., redirect to login)
+          }
+        } catch (error) {
+          console.error("Failed to check login status:", error);
+        }
+      };
+  
+      checkLoginStatus();
+    }
+  }, []);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
-
+    setIsLoading(true);
     const userDataString = localStorage.getItem("userData");
     const userData = userDataString ? JSON.parse(userDataString) : null;
 
@@ -109,6 +178,8 @@ const ProductForm = () => {
       return;
     }
 
+
+  
     const organic = event.target.organic.value === "true"; // Convert to boolean
     const formData = new FormData();
     formData.append("title", event.target.title.value);
@@ -116,9 +187,9 @@ const ProductForm = () => {
     formData.append("category", selectedCategory ? selectedCategory.value : "");
     formData.append("organic", organic);
     formData.append("price", parseFloat(event.target.price.value));
-    formData.append("name", event.target.name.value);
-    formData.append("phone", event.target.phone.value);
-    formData.append("address", event.target.address.value);
+    formData.append("name", userData_.name);
+    formData.append("phone", userData_.phone);
+    formData.append("address", userData_.address);
 
     // Append image files to formData
     imageFiles.forEach((file) => {
@@ -142,18 +213,33 @@ const ProductForm = () => {
       const data = await response.json();
       if (response.ok) {
         alert("Product request submitted successfully!");
-        // Reset the form or navigate as needed
+        
+        setIsLoading(false);
+        event.target.title.value = '';
+      event.target.description.value = '';
+      event.target.price.value = '';
+      setImages([]);
+      setImageFiles([]);
+      setSelectedCategory(null);
       } else {
         alert(data.message || "Failed to submit the product request.");
+        setIsLoading(false);
       }
     } catch (error) {
       alert("Error submitting the form: " + error.message);
+      setIsLoading(false);
       console.error(error);
     }
   };
 
   return (
     <>
+    {isloading && (
+        <div className="flex items-center justify-center h-screen">
+          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+          <p className="ml-4">Loading Buyer form...</p>
+        </div>
+      )}
       <Navbar />
       <div className="bg-gray-100 p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-20">
         <h1 className="text-2xl font-semibold text-center mb-6">
@@ -298,7 +384,8 @@ const ProductForm = () => {
               name="name"
               type="text"
               placeholder="Enter Name"
-              className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500"
+            className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
+              value={userData_.name}
               required
             />
           </div>
@@ -312,7 +399,8 @@ const ProductForm = () => {
               name="phone"
               type="text"
               placeholder="Enter Mobile Number"
-              className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500"
+              value={userData_.phone}
+              className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
               required
             />
           </div>
@@ -326,7 +414,8 @@ const ProductForm = () => {
               name="address"
               type="text"
               placeholder="Enter Address"
-              className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500"
+              value={userData_.address}
+            className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
               required
             />
           </div>
