@@ -84,7 +84,7 @@ const Buyerform = () => {
       const fetchProducts = async () => {
         try {
           const response = await fetch(
-            `http://localhost:5000/api/user/${userData.phone}`
+            `https://naturals-emart-project.onrender.com/api/user/${userData.phone}`
           );
           if (!response.ok) {
             throw new Error("Network response was not ok");
@@ -176,7 +176,7 @@ const Buyerform = () => {
 
     // Check the user's current product count
     const response = await fetch(
-      `http://localhost:5000/api/checkUserProducts?phone=${userData.phone}`
+      `https://naturals-emart-project.onrender.com/api/checkUserProducts?phone=${userData.phone}`
     );
     const result = await response.json();
 
@@ -205,7 +205,7 @@ const Buyerform = () => {
     });
 
     try {
-      const response = await fetch("http://localhost:5000/api/Buyer_one_time", {
+      const response = await fetch("https://naturals-emart-project.onrender.com/api/Buyer_one_time", {
         method: "POST",
         body: formData,
       });
