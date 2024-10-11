@@ -23,7 +23,7 @@ const AdminApprovalPage = () => {
   const [imageList, setImageList] = useState([]); // To stor
   const fetchProductRequests = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/api/admin/requests");
+      const response = await axios.get("https://naturals-emart-project.onrender.com/api/admin/requests");
       console.log(response.data);
       setProductRequests(response.data.productRequests || []);
     } catch (error) {
@@ -79,7 +79,7 @@ const AdminApprovalPage = () => {
   const handleApproval = async (id, status, phone) => {
     try {
       const detailsToUse = editingRequest ? editedDetails : {};
-      const response = await axios.post("http://localhost:5000/api/admin/approve", {
+      const response = await axios.post("https://naturals-emart-project.onrender.com/api/admin/approve", {
         id,
         status,
         phone,
@@ -103,7 +103,7 @@ const AdminApprovalPage = () => {
   const handleApproval_regular = async (id, status, phone,saleType) => {
     try {
       const detailsToUse = editingRequest ? editedDetails : {};
-      const response = await axios.post("http://localhost:5000/api/admin/approve_regular", {
+      const response = await axios.post("https://naturals-emart-project.onrender.com/api/admin/approve_regular", {
         id,
         status,
         phone,
@@ -126,7 +126,7 @@ const AdminApprovalPage = () => {
   const handleApproval_buyer = async (id, status, phone) => {
     try {
       const detailsToUse = editingRequest ? editedDetails : {};
-      const response = await axios.post("http://localhost:5000/api/admin/approve_buyer", {
+      const response = await axios.post("https://naturals-emart-project.onrender.com/api/admin/approve_buyer", {
         id,
         status,
         phone,
