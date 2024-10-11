@@ -200,6 +200,10 @@ function Navbar() {
                 <ImSearch className="ml-2" />
               </div>
             </li>
+  <li>
+<button onClick ={()=>navigate('/admin')}>
+admin</button>
+</li>
           </ul>
         </div>
       )}
