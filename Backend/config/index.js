@@ -8,6 +8,7 @@
     const User = require('../router/User');
     const buyerform = require('../router/Buyer')
     const GET_seller = require('../router/Get_Seller');
+    const GetSession = require("../router/GetSession")
     const app = express();
 
     const port = 5000;
@@ -29,6 +30,7 @@
     app.use('/api', buyerform);
     app.use('/api', admin);
     app.use('/api', User);
+    app.use("/api", GetSession)
 
 
     app.listen(port, () => {

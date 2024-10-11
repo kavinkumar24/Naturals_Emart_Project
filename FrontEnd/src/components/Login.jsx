@@ -35,6 +35,7 @@ function Login() {
       if (data.token) {
         // Save user data and login state to localStorage
         const userData = {
+          user_id: data.user._id,
           name: data.user.name,
           phone: data.user.phone,
           thaluka: data.user.thaluka,
