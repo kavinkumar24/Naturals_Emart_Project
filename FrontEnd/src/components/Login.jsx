@@ -14,7 +14,7 @@ function Login() {
   const handleLogin = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch('https://naturals-emart-project.onrender.com/api/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -66,7 +66,7 @@ function Login() {
 
   const fetchProducts = async (phone, token) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/Seller/${phone}`, {
+      const response = await fetch(`https://naturals-emart-project.onrender.com/api/Seller/${phone}`, {
         headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}` // Include the JWT token in the Authorization header
