@@ -20,7 +20,7 @@ function Buyer() {
   useEffect(() => {
     const fetchSellers = async () => {
       try {
-        const response = await axios.get("http://localhost:5000/api/sellers");
+        const response = await axios.get("https://naturals-emart-project.onrender.com/api/sellers");
         const sellers = response.data;
 
         // Extracting products from sellers, omitting "buyer_request" saleType
