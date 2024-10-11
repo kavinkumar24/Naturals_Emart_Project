@@ -14,6 +14,32 @@ import PrivateRoute from './components/Privateroute';
 
 function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false); // State for user login status
+  const [loading, setLoading] = useState(true); // State to manage loading
+
+  useEffect(() => {
+    const checkUserLogin = async () => {
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      if (userData) {
+        const userId = userData.user_id; // Assuming you have a user_id in userData
+        try {
+          const response = await fetch(`http://localhost:5000/api/usersession/${userId}`, {
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include token if needed
+            },
+          });
+          const data = await response.json();
+          setIsLoggedIn(data.isLoggedIn);
+        } catch (error) {
+          console.error('Error checking user login status:', error);
+        }
+      }
+      setLoading(false); // Stop loading after checking
+    };
+
+    checkUserLogin();
+  }, []);
 
   useEffect(() => {
     const adminIsLoggedIn = localStorage.getItem('adminIsLoggedIn');
@@ -31,26 +57,31 @@ function App() {
     localStorage.removeItem('adminIsLoggedIn');
   };
 
-  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true'; // Check for user login status
-
   return (
     <>
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path="/seller" element={<Seller />} />
-        <Route path='/buyer' element={<Buyer />} />
-        
-        {/* Conditional rendering for login and register routes */}
-        <Route path='/login' element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
-        <Route path='/register' element={isLoggedIn ? <Navigate to="/" /> : <Register />} />
-        
-        <Route path='/admin/login' element={<AdminLogin onLogin={handleLogin} />} />
-        
-        <Route path='/admin' element={isAuthenticated ? <Admin_page onLogout={handleLogout} /> : <Navigate to="/admin/login" />} />
-        <Route path='/one_time_sell_form' element={<PrivateRoute element={<Seller_Form />} />} />
-        <Route path='/regular_sell_form' element={<PrivateRoute element={<Seller_regular />} />} />
-        <Route path='/buyer_form' element={<PrivateRoute element={<Buyerform />} />} />
-      </Routes>
+      {loading ? ( // Show loading while checking login status
+         <div className="flex items-center justify-center h-screen">
+         <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+         <p className="ml-4">Loading...</p>
+       </div>
+      ) : (
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path="/seller" element={<Seller />} />
+          <Route path='/buyer' element={<Buyer />} />
+          
+          {/* Conditional rendering for login and register routes */}
+          <Route path='/login' element={isLoggedIn ? <Navigate to="/" /> : <Login />} />
+          <Route path='/register' element={isLoggedIn ? <Navigate to="/" /> : <Register />} />
+          
+          <Route path='/admin/login' element={<AdminLogin onLogin={handleLogin} />} />
+          
+          <Route path='/admin' element={isAuthenticated ? <Admin_page onLogout={handleLogout} /> : <Navigate to="/admin/login" />} />
+          <Route path='/one_time_sell_form' element={<PrivateRoute element={<Seller_Form />} />} />
+          <Route path='/regular_sell_form' element={<PrivateRoute element={<Seller_regular />} />} />
+          <Route path='/buyer_form' element={<PrivateRoute element={<Buyerform />} />} />
+        </Routes>
+      )}
     </>
   );
 }

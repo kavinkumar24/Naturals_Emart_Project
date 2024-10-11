@@ -21,42 +21,43 @@ function Login() {
         },
         body: JSON.stringify({ phone, password }),
       });
-
+  
       if (!response.ok) {
         const errorData = await response.json();
+        alert(errorData.message || "Login failed");
         setIsLoading(false);
         return;
       }
-
+  
       const data = await response.json();
       console.log('Login response:', data);
-
-      // Check if token exists
+  
       if (data.token) {
-        // Save user data and login state to localStorage
         const userData = {
-          user_id: data.user._id,
+          user_id: data.user._id, // Store user ID
           name: data.user.name,
           phone: data.user.phone,
           thaluka: data.user.thaluka,
           district: data.user.district,
         };
         setUser(userData);
-        console.log("vfdvdfffdf", userData)
-        localStorage.setItem('isLoggedIn', 'true'); // Save login state
+        // localStorage.setItem('isLoggedIn', 'true'); // Save login state
         localStorage.setItem('userData', JSON.stringify(userData)); // Save user data
         localStorage.setItem('token', data.token); // Save the JWT token
         console.log('Token saved to localStorage:', localStorage.getItem('token'));
+  
+        // Fetch user session after login
+        await fetchUserSession(userData.user_id);
+  
+        alert(data.message); // Display success message
+  
+        // Fetch products after successful login
+        // fetchProducts(data.user.phone, data.token);
+  
+        navigate('/one_time_sell_form'); // Redirect to the form page
       } else {
         console.error('Token is undefined');
       }
-
-      alert(data.message); // Display success message
-
-      // Fetch products after successful login
-      fetchProducts(data.user.phone, data.token);
-
-      navigate('/one_time_sell_form'); // Redirect to the form page
     } catch (error) {
       console.error('Login error:', error);
       alert('An error occurred while logging in. Please try again.');
@@ -64,6 +65,32 @@ function Login() {
       setIsLoading(false); // Stop loading animation
     }
   };
+  
+  const fetchUserSession = async (userId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/usersession/${userId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include JWT token if needed
+        },
+      });
+  
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error fetching user session:', errorData.message);
+        return;
+      }
+  
+      const sessionData = await response.json();
+      console.log('User session data:', sessionData);
+  
+      // Store user_id in local storage
+      localStorage.setItem('user_id', sessionData.user_id); // Assuming the sessionData contains user_id
+    } catch (error) {
+      console.error('Error fetching user session:', error);
+    }
+  };
+  
 
   const fetchProducts = async (phone, token) => {
     try {

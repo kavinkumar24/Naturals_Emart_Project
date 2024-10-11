@@ -18,10 +18,47 @@ function Navbar() {
   const [user, setUser] = useState(null);
   const [showProfileModal, setShowProfileModal] = useState(false); // Modal state
   const [products, setProducts] = useState([]);
+  const [isLoggedIn, setLoggedIn] = useState(false);
 
+ 
+
+  const fetchUserSession = async (userId) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/usersession/${userId}`, {
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include JWT token if needed
+        },
+      });
+      const data = await response.json();
+  
+      setLoggedIn(data.isLoggedIn)
+      console.log(data.isLoggedIn)
+      console.log("hurnfd",isLoggedIn)
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Error fetching user session:', errorData.message);
+        return;
+      }
+  
+      const sessionData = await response.json();
+      console.log('User session data:', sessionData);
+  
+      // Store user_id in local storage
+      localStorage.setItem('user_id', sessionData.userId); 
+
+    } catch (error) {
+      console.error('Error fetching user session:', error);
+    }
+  };
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
-    if (isLoggedIn === "true") {
+    const userData = JSON.parse(localStorage.getItem('userData'));
+    const userId = userData ? userData.user_id : null; 
+    
+    fetchUserSession(userId);
+    console.log(userId,"g hjkl")
+
+    if (userId) {
       const userData = JSON.parse(localStorage.getItem("userData"));
       setUser(userData);
       console.log("User data:", userData);
@@ -36,6 +73,7 @@ function Navbar() {
             throw new Error("Network response was not ok");
           }
           const data = await response.json();
+          console.log(data,"kkkfile")
           setProducts(data.products || []);
           console.log("Product data:", data.products);
         } catch (error) {
@@ -45,16 +83,16 @@ function Navbar() {
 
       fetchProducts();
     }
-  }, []);
+  }, [isLoggedIn]);
 
   useEffect(() => {
-    const isLoggedIn = localStorage.getItem("isLoggedIn");
-    if (isLoggedIn === "true") {
+   
+    if (isLoggedIn ) {
       const userData = JSON.parse(localStorage.getItem("userData"));
       setUser(userData);
       console.log("User data:", userData);
     }
-  }, []);
+  }, [isLoggedIn]);
 
   const handleNav = () => {
     setShowMenu(!showMenu);
@@ -71,12 +109,32 @@ function Navbar() {
       navigate(path);
     }, 1000);
   };
-
-  const handleLogout = () => {
-    localStorage.removeItem("isLoggedIn");
-    localStorage.removeItem("userData");
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      const userId = JSON.parse(localStorage.getItem('userData')).user_id; // Get user ID from local storage
+  
+      // Send logout request to the server
+      await fetch(`http://localhost:5000/api/usersession/logout/${userId}`, {
+        method: 'PUT', // Assuming you want to update the session
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include JWT if needed
+        },
+      });
+  
+      // Clear local storage
+      localStorage.removeItem("isLoggedIn");
+      localStorage.removeItem("userData");
+      localStorage.removeItem("token"); // Also remove the token
+  
+      // Navigate to login page
+      navigate("/login");
+    } catch (error) {
+      console.error('Logout error:', error);
+      alert('An error occurred while logging out. Please try again.');
+    }
   };
+  
 
   return (
     <div
@@ -124,7 +182,7 @@ function Navbar() {
           <AiOutlineLogin className='mr-2' /> Sign Up
         </li> */}
 
-        {user ? (
+        {isLoggedIn ? (
           <div className="relative mr-2">
             <div className="bg-amber-300 h-10 w-10 rounded-full p-2 flex items-center justify-center">
               <IoPerson
@@ -139,7 +197,7 @@ function Navbar() {
             className="flex items-center p-4 mx-2 cursor-pointer"
             onClick={() => navigate("/login")}
           >
-            {/* <AiOutlineLogin className='mr-2' /> Login */}
+            <AiOutlineLogin className='mr-2' /> Login
           </li>
         )}
       </ul>
@@ -244,46 +302,36 @@ admin</button>
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
-                  <tr key={product._id}>
-                    <td className="border px-4 py-2">{product.title}</td>
-                    <td className="border px-4 py-2">{product.saleType}</td>
-                    <td className="border px-4 py-2">{product.unique_id}</td>
-                    <td className="border px-4 py-2">
-                      <div className="flex items-center">
-                        {product.images && product.images.length > 0 ? (
-                          <>
-                            <button
-                              onClick={() => openImageModal(product.images[0])}
-                              className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full mx-1"
-                            >
-                              <img
-                                src={product.images[0]}
-                                alt={product.title}
-                                className="w-full h-full object-cover rounded-full"
-                              />
-                            </button>
-                            {product.images.length > 1 && (
-                              <button
-                                onClick={() => openImageModal(product.images[1])}
-                                className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full mx-1"
-                              >
-                                <img
-                                  src={product.images[1]}
-                                  alt={product.title}
-                                  className="w-full h-full object-cover rounded-full"
-                                />
-                              </button>
-                            )}
-                          </>
-                        ) : (
-                          <span className="text-gray-400">No Image</span>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+  {products.map((product) => (
+    <tr key={product._id}>
+      <td className="border px-4 py-2">{product.title}</td>
+      <td className="border px-4 py-2">{product.saleType}</td>
+      <td className="border px-4 py-2">{product.unique_id}</td>
+      <td className="border px-4 py-2">
+        <div className="flex items-center">
+          {product.images && product.images.length > 0 ? (
+            product.images.map((image, index) => (
+              <button
+                key={index}
+                onClick={() => openImageModal(image)}
+                className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full mx-1"
+              >
+                <img
+                  src={image}
+                  alt={product.title}
+                  className="w-full h-full object-cover rounded-full"
+                />
+              </button>
+            ))
+          ) : (
+            <span className="text-gray-400">No Image</span>
+          )}
+        </div>
+      </td>
+    </tr>
+  ))}
+</tbody>
+
             </table>
           </div>
         ) : (
