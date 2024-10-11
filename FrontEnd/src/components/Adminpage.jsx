@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { FaEdit } from "react-icons/fa";
+import { useNavigate } from "react-router-dom";
+import { FiLogOut } from "react-icons/fi";
 
 const AdminApprovalPage = () => {
   const [productRequests, setProductRequests] = useState([]);
@@ -46,6 +48,8 @@ const AdminApprovalPage = () => {
       setImageModalOpen(true);
     }
   };
+  const navigate = useNavigate();
+
 
   const goToPreviousImage = () => {
     setImageIndex((prevIndex) => (prevIndex > 0 ? prevIndex - 1 : imageList.length - 1));
@@ -176,10 +180,25 @@ const AdminApprovalPage = () => {
     );
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('adminIsLoggedIn'); // Clear the admin login status
+    navigate('/admin/login'); // Redirect to login page
+  };
+
   return (
     <div className="max-w-6xl mx-auto p-4">
-      <h1 className="text-2xl font-bold mb-4">Product Approval Requests</h1>
+    <div className="flex justify-between items-center mb-4">
+  <h1 className="text-2xl font-bold">Product Approval Requests</h1>
 
+  <button onClick={handleLogout} className="py-2 px-4 bg-red-500 text-white rounded-md">
+    Logout
+    <FiLogOut className="inline-block ml-2" />
+  </button>
+</div>
+
+
+
+    
       {/* Category Toggle Buttons */}
       <div className="mb-4">
         <button
@@ -201,6 +220,7 @@ const AdminApprovalPage = () => {
           Buyer Products
         </button>
       </div>
+
 
       <input
         type="text"

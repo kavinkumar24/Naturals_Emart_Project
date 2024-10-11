@@ -24,7 +24,6 @@ function Login() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        // alert(errorData.message);
         setIsLoading(false);
         return;
       }
@@ -35,9 +34,16 @@ function Login() {
       // Check if token exists
       if (data.token) {
         // Save user data and login state to localStorage
-        setUser(data.user);
+        const userData = {
+          name: data.user.name,
+          phone: data.user.phone,
+          thaluka: data.user.thaluka,
+          district: data.user.district,
+        };
+        setUser(userData);
+        console.log("vfdvdfffdf", userData)
         localStorage.setItem('isLoggedIn', 'true'); // Save login state
-        localStorage.setItem('userData', JSON.stringify(data.user)); // Save user data
+        localStorage.setItem('userData', JSON.stringify(userData)); // Save user data
         localStorage.setItem('token', data.token); // Save the JWT token
         console.log('Token saved to localStorage:', localStorage.getItem('token'));
       } else {
@@ -69,7 +75,6 @@ function Login() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        // alert(errorData.message);
         return;
       }
 

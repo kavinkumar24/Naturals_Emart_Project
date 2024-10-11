@@ -2,8 +2,11 @@ import Navbar from './Navbar';
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom'; 
 import SellerDetailModal from './Seller_modal';
-import SaleOptionModal from './Seller_type_modal'; // Import the new modal
-import axios from 'axios'; // Make sure to install axios
+import SaleOptionModal from './Seller_type_modal'; 
+import { MdOutlineAddLocationAlt } from "react-icons/md";
+import { IoPersonCircleOutline } from "react-icons/io5";
+import axios from 'axios';
+import Image_Not_available from '../assests/photo.png';
 
 const SellerCards = () => {
   const [products, setProducts] = useState([]);
@@ -11,32 +14,33 @@ const SellerCards = () => {
   const [selectedSeller, setSelectedSeller] = useState(null); 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isSaleModalOpen, setIsSaleModalOpen] = useState(false);
-  const [currentSaleType, setCurrentSaleType] = useState(null); // State for current sale type
+  const [currentSaleType, setCurrentSaleType] = useState(null); 
+  const [searchQuery, setSearchQuery] = useState(""); // State for search query
   const navigate = useNavigate();
 
   // Fetch sellers from the backend
   useEffect(() => {
     const fetchSellers = async () => {
       try {
-        const response = await axios.get('http://localhost:5000/api/sellers'); // Fetching sellers
+        const response = await axios.get('http://localhost:5000/api/sellers');
         const sellers = response.data;
 
         // Extracting products from sellers, omitting "buyer_request" saleType
         const allProducts = sellers.flatMap(seller => 
           seller.products
-            .filter(product => product.saleType !== 'buyer_request') // Filter out buyer_request
+            .filter(product => product.saleType !== 'buyer_request')
             .map(product => ({
               ...product,
-
-              sellerName: seller.name, // Add seller name for reference
-              sellerId: seller._id, // Store seller ID if needed
-              sellerLocation: seller.location, // Add seller location
-              sellerImage: seller.image, // Add seller image
-              sellerPhone: seller.phone 
+              sellerName: seller.name,
+              sellerId: seller._id,
+              sellerLocation: seller.location,
+              sellerImage: seller.image,
+              sellerPhone: seller.phone,
+              thaluka: seller.thaluka,
             }))
         );
 
-        setProducts(allProducts); // Set the flat list of products
+        setProducts(allProducts);
         setFilteredProducts(allProducts); // Initially display all products
       } catch (error) {
         console.error('Error fetching sellers:', error);
@@ -46,20 +50,19 @@ const SellerCards = () => {
     fetchSellers();
   }, []);
 
-  // Filter products based on sale type
+  // Filter products based on sale type and search query
   useEffect(() => {
-    if (currentSaleType) {
-      setFilteredProducts(products.filter(product => product.saleType === currentSaleType));
-    } else {
-      setFilteredProducts(products); // Show all if no filter is applied
-    }
-  }, [currentSaleType, products]);
+    const filtered = products.filter(product => 
+      product.title.toLowerCase().includes(searchQuery.toLowerCase()) &&
+      (!currentSaleType || product.saleType === currentSaleType)
+    );
+    setFilteredProducts(filtered);
+  }, [currentSaleType, products, searchQuery]);
 
   const openModal = (product) => {
-  setSelectedSeller(product); // Set the selected product data
-  setIsModalOpen(true); // Open the modal
-};
-
+    setSelectedSeller(product);
+    setIsModalOpen(true);
+  };
 
   const closeModal = () => {
     setIsModalOpen(false);
@@ -67,11 +70,16 @@ const SellerCards = () => {
   };
 
   const handleCreateNew = () => {
-    setIsSaleModalOpen(true); // Open the sale option modal
+    const token = localStorage.getItem('token'); // Check for the token
+    if (!token) {
+      navigate('/login'); // Redirect to login if not logged in
+    } else {
+      setIsSaleModalOpen(true); // Open the sale option modal if logged in
+    }
   };
 
   const handleSaleOptionSelect = (option) => {
-    setIsSaleModalOpen(false); // Close sale option modal
+    setIsSaleModalOpen(false);
     if (option === 'one_time_sale') {
       navigate('/one_time_sell_form'); 
     } else if (option === 'regular_sale') {
@@ -93,53 +101,79 @@ const SellerCards = () => {
           </button>
         </div>
 
-        {/* Filter Buttons */}
+        {/* Search Input */}
         <div className="mb-4">
-          <button
-            className={`px-4 py-2 mr-2 rounded ${currentSaleType === 'regular_sale' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => setCurrentSaleType('regular_sale')}
-          >
-            Regular Sale
-          </button>
-          <button
-            className={`px-4 py-2 rounded ${currentSaleType === 'one_time_sale' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => setCurrentSaleType('one_time_sale')}
-          >
-            One-Time Sale
-          </button>
-          <button
-            className="px-4 py-2 rounded bg-gray-200 ml-2"
-            onClick={() => setCurrentSaleType(null)} // Reset filter
-          >
-            Show All
-          </button>
+          <input
+            type="text"
+            placeholder="Search by title..."
+            className="border border-gray-300 rounded px-4 py-2 w-full"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-6 p-6">
-          {filteredProducts.map((product, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg shadow-xl shadow-zinc-200 p-4 flex items-center border border-solid border-slate-200 cursor-pointer"
-              onClick={() => openModal(product)} // Open modal for product
+        {/* Filter Buttons */}
+        <div className="mb-4">
+          <div className='grid grid-cols-2 md:grid-cols-7 gap-5 md:gap-0 sm:gap-0'>
+            <button
+              className={`px-4 py-2 mr-2 rounded ${currentSaleType === 'regular_sale' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              onClick={() => setCurrentSaleType('regular_sale')}
             >
-                 <img
-        src={product.images[0] || 'https://cdn.pixabay.com/photo/2015/12/01/20/28/road-1072823__340.jpg'} // Fallback image
-        alt={product.title}
-        className="w-16 h-16 rounded-full mr-4" // Ensure image is round
-      />
-              <div className="flex flex-col">
-                <h2 className="text-lg font-semibold">{product.title}</h2>
-                <p className="text-gray-500 text-sm mb-2">{product.description || 'No description available'}</p>
-                <div className="flex items-center text-gray-700 text-sm mb-1">
-                  <span className="mr-2">👤</span>
-                  {product.sellerName || 'Unknown Seller'}
-                </div>
-                <div className="flex items-center text-gray-700 text-sm">
-                  <span className="mr-2">💲</span>
-                  {product.price || 'No price available'}
-                </div>
-              </div>
-            </div>
+              Regular Sale
+            </button>
+            <button
+              className={`px-4 py-2 rounded mr-2 ${currentSaleType === 'one_time_sale' ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              onClick={() => setCurrentSaleType('one_time_sale')}
+            >
+              One-Time Sale
+            </button>
+            <button
+              className="px-4 py-2 rounded bg-gray-200 mr-2"
+              onClick={() => setCurrentSaleType(null)}
+            >
+              Show All
+            </button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6 p-6">
+          {filteredProducts.map((product, index) => (
+           <div
+           key={index}
+           className="bg-white rounded-lg shadow-xl shadow-zinc-200 p-4 flex items-start relative border border-solid border-slate-200 cursor-pointer"
+           onClick={() => openModal(product)}
+         > 
+           <img
+             src={product.images[0] || Image_Not_available}
+             alt={product.title}
+             className="w-16 h-16 rounded-full mr-4 border-4 shadow-lg border-slate-200"
+           />
+           <div className="flex flex-col flex-grow">
+             <h2 className="text-lg font-semibold">{product.title}</h2>
+             <p className="text-gray-500 text-sm mb-2">{new Date(product.Approved_at).toLocaleString()}</p>
+             
+             <div className="flex items-center text-gray-700 text-sm mb-1">
+               <span className="mr-2">
+                 <IoPersonCircleOutline size={20}/>
+               </span>
+               <span className='text-sm text-slate-400'> பெயர்:  </span>
+               <span className='font-semibold text-md ml-2'> {product.sellerName || 'Unknown Seller'}</span>
+             </div>
+             <div className="flex items-center text-gray-700 text-sm mt-2">
+               <span className="mr-2">
+                 <MdOutlineAddLocationAlt size={20} />
+               </span>
+               <span className='text-sm text-slate-400'> தாலுகா:  </span>
+               <span className='font-semibold text-md ml-2'> {product.thaluka}</span>
+             </div>
+           </div>
+           
+           {/* Unique ID positioned absolutely */}
+           <div className="absolute right-4 top-4 flex items-center justify-center bg-yellow-400 text-black font-bold rounded-full h-10 w-10 text-sm">
+             {product.unique_id || 0} {/* Display unique_id here */}
+           </div>
+         </div>
+         
           ))}
         </div>
       </div>

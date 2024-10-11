@@ -1,4 +1,4 @@
-import React  from "react";
+import React, { useEffect }  from "react";
 import bg_home from "../assests/bg_img.jpg";
 import Grains from "../assests/grains_bg.jpg";
 import Navbar from "./Navbar";
@@ -16,6 +16,41 @@ function Home() {
     localStorage.getItem("theme") === "dark" ? "dark" : "light"
   );
   
+  const [categoryCounts, setCategoryCounts] = useState({
+    FPO: 0,
+    SHG: 0,
+    ENT: 0,
+    Farmer: 0,
+  });
+
+  useEffect(() => {
+    const fetchSellers = async () => {
+      try {
+        const response = await fetch("http://localhost:5000/api/sellers");
+        const sellers = await response.json();
+
+        // Count categories
+        const counts = { FPO: 0, SHG: 0, ENT: 0, Farmer: 0 };
+        sellers.forEach(seller => {
+          seller.products.forEach(product => {
+            const category = product.category;
+
+            if (category && counts.hasOwnProperty(category)) {
+              counts[category] = (counts[category] || 0) + 1;
+            }
+          });
+        });
+
+        setCategoryCounts(counts);
+        console.log("Category Counts:", counts);
+      } catch (error) {
+        console.error("Error fetching sellers:", error);
+      }
+    };
+
+    fetchSellers();
+  }, []);
+
   const handle_route = (path)=>{
     setLoad(true);
     setTimeout(()=>{
@@ -119,34 +154,14 @@ function Home() {
       
     </div>
     <div className="mt-12 flex flex-wrap justify-center gap-14 mb-20">
-  <div className="bg-white p-4 rounded-lg shadow-lg text-center flex flex-row items-center space-x-4 border-slate-300 border border-solid">
-  <div className="bg-yellow-300 p-4 rounded-lg shadow-lg">
-    <div className="mt-1 text-gray-700 text-xl font-bold">FPU</div>
-  </div>
-  <div className="text-2xl font-normal text-blue-600">100</div>
-</div>
-
-  <div className="bg-white p-6 rounded-lg shadow-lg text-center flex flex-row items-center space-x-4 border-slate-300 border border-solid ">
-  <div className="bg-yellow-300 p-4 rounded-lg shadow-lg">
-    <div className="mt-1 text-gray-700 text-xl font-bold">SHG</div>
-  </div>
-  <div className="text-2xl font-normal text-blue-600">200</div>
-</div>
-
-  <div className="bg-white p-6 rounded-lg shadow-lg text-center flex flex-row items-center space-x-4 border-slate-300 border border-solid ">
-  <div className="bg-yellow-300 p-4 rounded-lg shadow-lg">
-    <div className="mt-1 text-gray-700 text-xl font-bold">ENT</div>
-  </div>
-  <div className="text-2xl font-normal text-blue-600">150</div>
-</div>
-
-  {/* Card 4 */}
-  <div className="bg-white p-6 rounded-lg shadow-lg text-center flex flex-row items-center space-x-4 border-slate-300 border border-solid ">
-  <div className="bg-yellow-300 p-4 rounded-lg shadow-lg">
-    <div className="mt-1 text-gray-700 text-xl font-bold">Farmer</div>
-  </div>
-  <div className="text-2xl font-normal text-blue-600">200</div>
-</div>
+    {Object.entries(categoryCounts).map(([category, count]) => (
+          <div key={category} className="bg-white p-6 rounded-lg shadow-lg text-center flex flex-row items-center space-x-4 border-slate-300 border border-solid">
+            <div className="bg-yellow-300 p-4 rounded-lg shadow-lg">
+              <div className="mt-1 text-gray-700 text-xl font-bold">{category}</div>
+            </div>
+            <div className="text-2xl font-normal text-blue-600">{count}</div>
+          </div>
+        ))}
 </div>
 <div className="w-[60%] h-[.2px] bg-orange-400 mx-auto mt-2 mb-10"></div> {/* Border Line */}
     

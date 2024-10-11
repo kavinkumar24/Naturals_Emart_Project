@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
+const AutoIncrement = require('mongoose-sequence')(mongoose);
+
+
 const RegularProductRequestSchema = new mongoose.Schema({
     title: String,
+    regular_product_id: Number, 
     description: String,
     category: String,
     images: [String],
@@ -18,6 +22,9 @@ const RegularProductRequestSchema = new mongoose.Schema({
     createdAt: { type: Date, default: Date.now },
     saleType: { type: String, enum: ['regular_sale'], default: 'regular_sale' }  // Set default to 'regular_sale'
 });
+
+RegularProductRequestSchema.plugin(AutoIncrement, { inc_field: 'regular_product_id', start_seq: 1 });
+
 
 // Create the Mongoose model
 const RegularProductRequest = mongoose.model('RegularProductRequest', RegularProductRequestSchema);

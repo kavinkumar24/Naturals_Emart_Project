@@ -5,8 +5,8 @@ import { useState } from "react";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
+import jsPDF from "jspdf";
+import html2canvas from "html2canvas";
 
 const Buyerform = () => {
   const navigate = useNavigate();
@@ -14,22 +14,29 @@ const Buyerform = () => {
   const [imageFiles, setImageFiles] = useState([]); // State to store the actual image files
   const fileInputRef = useRef(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-    const [userData_, setUserData] = useState({
-        name: "",
-        phone: "",
-        address: "",
-        unique_id:"",
-    });
-    const [user, setUser] = useState(null);
-    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-const [previewData, setPreviewData] = useState({});
+  const [userData_, setUserData] = useState({
+    name: "",
+    phone: "",
+    address: "",
+    unique_id: "",
+  });
+  const [user, setUser] = useState(null);
+  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+  const [previewData, setPreviewData] = useState({});
 
+  const [selectedSector, setSelectedSector] = useState(null); // State for selected sector
+
+  const handleSectorChange = (option) => {
+    setSelectedSector(option);
+    // If you want to clear the company name input when changing sectors
+    if (option && option.value !== "நிறுவனம்") {
+      setUserData((prev) => ({ ...prev, companyName: "" }));
+    }
+  };
 
   const handleImageUpload = (event) => {
     const files = Array.from(event.target.files);
     const imageFiles = files.filter((file) => file.type.startsWith("image/"));
-
-  
 
     // Create object URLs to preview images
     const imagePreviews = imageFiles.map((file) => URL.createObjectURL(file));
@@ -49,29 +56,22 @@ const [previewData, setPreviewData] = useState({});
     fileInputRef.current.value = "";
   };
 
-
   const handlePreview = () => {
-    
     const data = {
-        title: document.querySelector('input[name="title"]').value,
-        description: document.querySelector('textarea[name="description"]').value,
-        category: selectedCategory ? selectedCategory.label : '',
-        size: document.querySelector('input[name="size"]').value,
-        name: userData_.name,
-        phone: userData_.phone,
-        address: userData_.address,
-        terms: document.getElementById('terms').checked,
+      title: document.querySelector('input[name="title"]').value,
+      description: document.querySelector('textarea[name="description"]').value,
+      category: selectedCategory ? selectedCategory.label : "",
+      size: document.querySelector('input[name="size"]').value,
+      name: userData_.name,
+      phone: userData_.phone,
+      address: userData_.address,
+      terms: document.getElementById("terms").checked,
     };
 
-    console.log('Preview data:', data);
+    console.log("Preview data:", data);
     setPreviewData(data);
     setIsPreviewOpen(true);
-};
-
-
-
-
-
+  };
 
   useEffect(() => {
     const isLoggedIn = localStorage.getItem("isLoggedIn");
@@ -94,10 +94,10 @@ const [previewData, setPreviewData] = useState({});
             name: data.name,
             phone: data.phone,
             address: data.address,
-            unique_id:data.unique_id,
+            unique_id: data.unique_id,
           });
-          
-          console.log(userData_)
+
+          console.log(userData_);
           console.log("Product data:", data.products);
         } catch (error) {
           console.error("Failed to fetch products:", error);
@@ -142,6 +142,13 @@ const [previewData, setPreviewData] = useState({});
     "பால் பொருட்கள்",
   ];
 
+  const sector = [
+    'நிறுவனம்',
+    'தனிநபர்',
+    'Others'
+  ]
+  
+
   const select_options = ["FPO", "SHG", "ENT", "Farmer"];
   const categoryOptions = category.map((item) => ({
     value: item,
@@ -152,91 +159,118 @@ const [previewData, setPreviewData] = useState({});
     label: item,
   }));
 
+  const sector_select = sector.map((item) => ({
+    value: item,
+    label:item,
+  }))
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
-    const userDataString = localStorage.getItem('userData');
+
+    const userDataString = localStorage.getItem("userData");
     const userData = userDataString ? JSON.parse(userDataString) : null;
 
     if (!userData) {
-        alert('User not found. Please log in again.');
-        return;
+      alert("User not found. Please log in again.");
+      return;
     }
 
     // Check the user's current product count
-    const response = await fetch(`http://localhost:5000/api/checkUserProducts?phone=${userData.phone}`);
+    const response = await fetch(
+      `http://localhost:5000/api/checkUserProducts?phone=${userData.phone}`
+    );
     const result = await response.json();
 
     if (response.ok && result.productCount >= 5) {
-        alert('You already have 5 products. Please remove one before adding a new one.');
-        return;
+      alert(
+        "You already have 5 products. Please remove one before adding a new one."
+      );
+      return;
     }
 
     const formData = new FormData();
-    formData.append('title', event.target.title.value);
-    formData.append('description', event.target.description.value);
-    formData.append('category', selectedCategory ? selectedCategory.value : '');
-    formData.append('size', parseFloat(event.target.size.value));
-    formData.append('name', userData_.name);
-    formData.append('phone', userData_.phone);
-    formData.append('address', userData_.address);
-    // formData.append('unique_id', unique_id); 
+    formData.append("title", event.target.title.value);
+    formData.append("description", event.target.description.value);
+    formData.append("category", selectedCategory ? selectedCategory.value : "");
+    formData.append("sector", selectedSector ? selectedSector.value : "");
+    formData.append("companyName", userData_.companyName || ""); 
+    formData.append("size", parseFloat(event.target.size.value));
+    formData.append("name", userData_.name);
+    formData.append("phone", userData_.phone);
+    formData.append("address", userData_.address);
+    // formData.append('unique_id', unique_id);
 
     // Append image files to formData
-    imageFiles.forEach(file => {
-        formData.append('images', file); // Use the actual file, not the preview URL
+    imageFiles.forEach((file) => {
+      formData.append("images", file); // Use the actual file, not the preview URL
     });
 
-
     try {
-        const response = await fetch('http://localhost:5000/api/Buyer_one_time', {
-            method: 'POST',
-            body: formData,
-        });
+      const response = await fetch("http://localhost:5000/api/Buyer_one_time", {
+        method: "POST",
+        body: formData,
+      });
 
-        const data = await response.json();
-        if (response.ok) {
-            alert('Product request submitted successfully!');
-            // Reset the form or navigate as needed
-        } else {
-            alert(data.message || 'Failed to submit the product request.');
-        }
+      const data = await response.json();
+      if (response.ok) {
+        alert("Product request submitted successfully!");
+        // Reset the form or navigate as needed
+      } else {
+        alert(data.message || "Failed to submit the product request.");
+      }
     } catch (error) {
-        alert('Error submitting the form: ' + error.message);
-        console.error(error);
+      alert("Error submitting the form: " + error.message);
+      console.error(error);
     }
-};
+  };
 
   return (
     <>
-    
       <Navbar />
 
       {isPreviewOpen && (
-    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-        <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md">
             <h2 className="text-lg font-bold mb-4">Preview</h2>
             <div>
-                <p><strong>Title:</strong> {previewData.title}</p>
-                <p><strong>Description:</strong> {previewData.description}</p>
-                <p><strong>Category:</strong> {previewData.category}</p>
-                <p><strong>Size:</strong> {previewData.size}</p>
-                <p><strong>Name:</strong> {previewData.name}</p>
-                <p><strong>Phone:</strong> {previewData.phone}</p>
-                <p><strong>Address:</strong> {previewData.address}</p>
-                <p><strong>Terms Accepted:</strong> {previewData.terms ? 'Yes' : 'No (required)'}</p>
+              <p>
+                <strong>Title:</strong> {previewData.title}
+              </p>
+              <p>
+                <strong>Description:</strong> {previewData.description}
+              </p>
+              <p>
+                <strong>Category:</strong> {previewData.category}
+              </p>
+              <p>
+                <strong>Size:</strong> {previewData.size}
+              </p>
+              <p>
+                <strong>Name:</strong> {previewData.name}
+              </p>
+              <p>
+                <strong>Phone:</strong> {previewData.phone}
+              </p>
+              <p>
+                <strong>Address:</strong> {previewData.address}
+              </p>
+              <p>
+                <strong>Terms Accepted:</strong>{" "}
+                {previewData.terms ? "Yes" : "No (required)"}
+              </p>
             </div>
             <div className="flex justify-end mt-4">
-              
-                <button onClick={() => setIsPreviewOpen(false)} className="px-4 py-2 bg-gray-300 rounded">Close</button>
+              <button
+                onClick={() => setIsPreviewOpen(false)}
+                className="px-4 py-2 bg-gray-300 rounded"
+              >
+                Close
+              </button>
             </div>
+          </div>
         </div>
-    </div>
-)}
+      )}
       <div className="bg-gray-100 p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-20">
-        <h1 className="text-2xl font-semibold text-center mb-6">
-          Buyer Form
-        </h1>
+        <h1 className="text-2xl font-semibold text-center mb-6">Buyer Form</h1>
 
         <form className="space-y-6" onSubmit={handleSubmit}>
           {/* Title */}
@@ -256,7 +290,9 @@ const [previewData, setPreviewData] = useState({});
           {/* பொருளடக்கம் (Dropdown) */}
           <div>
             <label className="block font-semibold text-gray-700 mb-2">
-              பொருளடக்கம் <span className="text-red-500">*</span>
+            தேவையான பொருள்
+
+            <span className="text-red-500">*</span>
             </label>
             <Select
               options={categoryOptions}
@@ -267,37 +303,67 @@ const [previewData, setPreviewData] = useState({});
             />
           </div>
 
+
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Sector <span className="text-red-500">*</span>
+            </label>
+            <Select
+              options={sector_select}
+              className="w-full"
+              placeholder="Select an option"
+              isSearchable
+              onChange={handleSectorChange}
+            />
+          </div>
+
+          {selectedSector && selectedSector.value === "நிறுவனம்" && (
+        <div>
+          <label className="block font-semibold text-gray-700 mb-2">
+            Company Name <span className="text-red-500">*</span>
+          </label>
+          <input
+            name="companyName"
+            type="text"
+            placeholder="Enter Company Name"
+            value={userData_.companyName || ""} // Add this to userData state
+            onChange={(e) => setUserData((prev) => ({ ...prev, companyName: e.target.value }))}
+            className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500"
+            required={selectedSector && selectedSector.value === "நிறுவனம்"} // Required if sector is "நிறுவனம்"
+          />
+        </div>
+      )}
+
+
           {/* ஆர்கானிக் (Radio Buttons) */}
-       
+
           {/* Photo Upload */}
           <div>
             <label className="block font-semibold text-gray-700 mb-2">
               போட்டோ <span className="text-red-500"></span>
             </label>
             <div
-        className="font-semibold text-gray-700 mb-2 max-w-full h-32 flex flex-col items-center justify-center cursor-pointer border-2 border-dashed mx-auto border-gray-300"
-        onClick={() => fileInputRef.current.click()} 
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          className="w-11 mb-2 fill-gray-500"
-          viewBox="0 0 32 32"
-        >
-          <path d="M23.75 11.044a7.99 7.99 0 0 0-15.5-.009A8 8 0 0 0 9 27h3a1 1 0 0 0 0-2H9a6 6 0 0 1-.035-12 1.038 1.038 0 0 0 1.1-.854 5.991 5.991 0 0 1 11.862 0A1.08 1.08 0 0 0 23 13a6 6 0 0 1 0 12h-3a1 1 0 0 0 0 2h3a8 8 0 0 0 .75-15.956z" />
-          <path d="M20.293 19.707a1 1 0 0 0 1.414-1.414l-5-5a1 1 0 0 0-1.414 0l-5 5a1 1 0 0 0 1.414 1.414L15 16.414V29a1 1 0 0 0 2 0V16.414z" />
-        </svg>
-        Import Reference Images
-
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          multiple
-          className="absolute opacity-0 cursor-pointer" // Hide visually but still interactable
-          onChange={handleImageUpload}
-          
-        />
-      </div>
+              className="font-semibold text-gray-700 mb-2 max-w-full h-32 flex flex-col items-center justify-center cursor-pointer border-2 border-dashed mx-auto border-gray-300"
+              onClick={() => fileInputRef.current.click()}
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className="w-11 mb-2 fill-gray-500"
+                viewBox="0 0 32 32"
+              >
+                <path d="M23.75 11.044a7.99 7.99 0 0 0-15.5-.009A8 8 0 0 0 9 27h3a1 1 0 0 0 0-2H9a6 6 0 0 1-.035-12 1.038 1.038 0 0 0 1.1-.854 5.991 5.991 0 0 1 11.862 0A1.08 1.08 0 0 0 23 13a6 6 0 0 1 0 12h-3a1 1 0 0 0 0 2h3a8 8 0 0 0 .75-15.956z" />
+                <path d="M20.293 19.707a1 1 0 0 0 1.414-1.414l-5-5a1 1 0 0 0-1.414 0l-5 5a1 1 0 0 0 1.414 1.414L15 16.414V29a1 1 0 0 0 2 0V16.414z" />
+              </svg>
+              Import Reference Images
+              <input
+                type="file"
+                accept="image/*"
+                ref={fileInputRef}
+                multiple
+                className="absolute opacity-0 cursor-pointer" // Hide visually but still interactable
+                onChange={handleImageUpload}
+              />
+            </div>
 
             {/* Show image previews */}
             <div className="mt-4 flex flex-wrap gap-4">
@@ -319,7 +385,6 @@ const [previewData, setPreviewData] = useState({});
             </div>
 
             {/* Error message for less than 2 images */}
-          
           </div>
 
           {/* Product Description */}
@@ -339,7 +404,7 @@ const [previewData, setPreviewData] = useState({});
           {/* Additional Inputs */}
           <div>
             <label className="block font-semibold text-gray-700 mb-2">
-            தேவையான அளவு  <span className="text-red-500">*</span>
+              தேவையான அளவு <span className="text-red-500">*</span>
             </label>
             <input
               name="size"
@@ -361,7 +426,6 @@ const [previewData, setPreviewData] = useState({});
               type="text"
               placeholder="Enter Name"
               className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
-              
             />
           </div>
 
@@ -376,7 +440,6 @@ const [previewData, setPreviewData] = useState({});
               value={userData_.phone}
               placeholder="Enter Mobile Number"
               className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
-              
             />
           </div>
 
@@ -391,7 +454,6 @@ const [previewData, setPreviewData] = useState({});
               value={userData_.address}
               placeholder="Enter Address"
               className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
-              
             />
           </div>
 
@@ -407,6 +469,24 @@ const [previewData, setPreviewData] = useState({});
               Terms and Condition <span className="text-red-500">*</span>
             </label>
           </div>
+
+          <p className="mt-6 text-sm text-gray-600 text-justify">
+            <span className="text-red-500 text-xl"> * </span>
+            <p className="inline text-justify">
+              இந்த Appன் மூலம் விவரனை செய்வில் பொருளுக்கு 2% அல்லது Rs 1000
+              இதிலும் எது குறைவோ அதே கட்டணம் தரசம் மதிக்கிறது.
+            </p>
+            <br></br>
+            <span className="text-red-500 text-xl"> * </span> பதிவுகள் இலவசம்
+            ஒரு ID க்கு ஐந்து பொருட்கள் மட்டுமே பதிவு செய்யலாம்<br></br>
+            <span className="text-red-500 text-xl"> * </span> ஒரு முறை விற்பனை
+            பகுதியில் பதிவுகள் 30 நாட்கள் வரை இருக்கும் தொடர் விற்பனை பகுதியில்
+            பதிவுகள் 150 நாட்கள் வரை இருக்கும் 150 நாட்களுக்குப் பிறகு தங்கள்
+            பதிவுகளை புதுப்பித்துக் கொள்ள வேண்டும்<br></br>
+            <span className="text-red-500 text-xl"> * </span> இந்த தளத்தின்
+            மூலம் விற்பனை செய்யப்படும், அல்லது வாங்கப்படும் பொருட்களுக்கு 2%
+            அல்லது ₹1000 இதில் எது குறைவானதோ அதை கமிஷனாக தர சம்மதிக்கிறேன்
+          </p>
 
           {/* Preview and Submit Buttons */}
           <div className="flex justify-center space-x-4">
@@ -427,10 +507,6 @@ const [previewData, setPreviewData] = useState({});
         </form>
 
         {/* Footer terms text */}
-        <p className="mt-6 text-sm text-gray-600">
-          இந்த Appன் மூலம் விவரனை செய்வில் பொருளுக்கு 2% அல்லது Rs 1000 இதிலும்
-          எது குறைவோ அதே கட்டணம் தரசம் மதிக்கிறது.
-        </p>
       </div>
     </>
   );

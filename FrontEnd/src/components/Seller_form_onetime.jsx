@@ -1,4 +1,4 @@
-  import React from "react";
+  import React, { useEffect } from "react";
   import Navbar from "./Navbar";
   import Select from 'react-select';
   import { useState } from "react";
@@ -16,8 +16,48 @@
     const [selectedCategory, setSelectedCategory] = useState(null);
     const[selected_category_comes, setSelectedCategoryComes] = useState(null);
     const [imageFiles, setImageFiles] = useState([]);
+    const [userData_, setUserData] = useState({
+      name: "",
+      phone: "",
+      address: "",
+      unique_id:"",
+  });
 
 
+  useEffect(() => {
+    const isLoggedIn = localStorage.getItem("isLoggedIn");
+    if (isLoggedIn === "true") {
+      const userData = JSON.parse(localStorage.getItem("userData"));
+      
+      console.log("User data:", userData);
+
+      // Fetch products from API
+      const fetchProducts = async () => {
+        try {
+          const response = await fetch(
+            `http://localhost:5000/api/user/${userData.phone}`
+          );
+          if (!response.ok) {
+            throw new Error("Network response was not ok");
+          }
+          const data = await response.json();
+          setUserData({
+            name: data.name,
+            phone: data.phone,
+            address: data.address,
+            unique_id:data.unique_id,
+          });
+          
+          console.log(userData_)
+          console.log("Product data:", data.products);
+        } catch (error) {
+          console.error("Failed to fetch products:", error);
+        }
+      };
+
+      fetchProducts();
+    }
+  }, []);
     const handleImageUpload = (event) => {
       const files = Array.from(event.target.files);
       const imageFiles = files.filter(file => file.type.startsWith('image/'));
@@ -118,9 +158,9 @@
       formData.append('organic', organic);
       formData.append('size', event.target.size.value);
       formData.append('price', parseFloat(event.target.price.value));
-      formData.append('name', event.target.name.value);
-      formData.append('phone', event.target.phone.value);
-      formData.append('address', event.target.address.value);
+      formData.append('name', userData_.name);
+      formData.append('phone', userData_.phone);
+      formData.append('address', userData_.address);
   
       // Append image files to formData
       imageFiles.forEach(file => {
@@ -345,10 +385,11 @@
               </label>
               <input
               name = "name"
+              value={userData_.name}
                 type="text"
                 placeholder="Enter Name"
-                className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500"
-                required
+              className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
+              
               />
             </div>
 
@@ -361,8 +402,9 @@
               name = "phone"
                 type="text"
                 placeholder="Enter Mobile Number"
-                className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500"
-                required
+                 className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
+                 value={userData_.phone}
+                
               />
             </div>
 
@@ -375,8 +417,8 @@
               name = "address"
                 type="text"
                 placeholder="Enter Address"
-                className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500"
-                required
+                 className="block w-full p-2 border border-gray-300 rounded-lg focus:ring focus:ring-blue-500 bg-gray-200 cursor-not-allowed"
+                 value={userData_.address}
               />
             </div>
 
@@ -393,6 +435,18 @@
               </label>
             </div>
 
+            <p className="mt-6 text-sm text-gray-600 text-justify">
+           <span className="text-red-500 text-xl"> * </span><p className="inline text-justify">இந்த Appன் மூலம் விவரனை செய்வில் பொருளுக்கு 2% அல்லது Rs 1000 இதிலும்
+            எது குறைவோ அதே கட்டணம் தரசம் மதிக்கிறது.
+            </p>
+<br></br>
+<span className="text-red-500 text-xl"> * </span> பதிவுகள் இலவசம்
+ஒரு ID க்கு ஐந்து பொருட்கள் மட்டுமே பதிவு செய்யலாம்<br></br>
+<span className="text-red-500 text-xl"> * </span> ஒரு முறை விற்பனை பகுதியில் பதிவுகள் 30 நாட்கள் வரை இருக்கும்
+தொடர் விற்பனை பகுதியில் பதிவுகள் 150 நாட்கள் வரை இருக்கும்
+150 நாட்களுக்குப் பிறகு தங்கள் பதிவுகளை புதுப்பித்துக் கொள்ள வேண்டும்<br></br>
+<span className="text-red-500 text-xl"> * </span> இந்த தளத்தின் மூலம் விற்பனை செய்யப்படும், அல்லது வாங்கப்படும் பொருட்களுக்கு 2% அல்லது ₹1000 இதில் எது குறைவானதோ அதை கமிஷனாக தர சம்மதிக்கிறேன்
+          </p>
             {/* Preview and Submit Buttons */}
             <div className="flex justify-center space-x-4">
               <button
@@ -411,10 +465,7 @@
           </form>
 
           {/* Footer terms text */}
-          <p className="mt-6 text-sm text-gray-600">
-            இந்த Appன் மூலம் விவரனை செய்வில் பொருளுக்கு 2% அல்லது Rs 1000 இதிலும்
-            எது குறைவோ அதே கட்டணம் தரசம் மதிக்கிறது.
-          </p>
+      
         </div>
       </>
     );

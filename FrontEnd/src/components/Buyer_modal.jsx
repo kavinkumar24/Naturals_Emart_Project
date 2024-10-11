@@ -5,8 +5,9 @@ import { PiPlantLight } from "react-icons/pi";
 import { CiLocationOn, CiUser } from "react-icons/ci";
 import { MdOutlineCategory, MdOutlineDescription, MdOutlineCurrencyRupee } from "react-icons/md";
 import "react-responsive-carousel/lib/styles/carousel.min.css";
+import Image_Not_available from '../assests/photo.png';
 
-const SellerDetailModal = ({ seller, isOpen, onClose }) => {
+const BuyerModal = ({ seller, isOpen, onClose }) => {
   if (!isOpen || !seller) return null;
 
   const defaultMobileNumber = "";
@@ -31,23 +32,40 @@ const SellerDetailModal = ({ seller, isOpen, onClose }) => {
         <div className="flex flex-col md:flex-row gap-12">
         <div className="w-full lg:w-96 mb-4">
           <Carousel showArrows={true} infiniteLoop={true} showThumbs={false} autoPlay={false}>
-            {seller.images &&
-              seller.images.map((image, index) => (
-                <div key={index} className="relative">
-                  <img
-                    src={image}
-                    alt={seller.title}
-                    className="object-cover w-full h-[300px] rounded-lg"
-                  />
-                </div>
-              ))}
+          {seller.images && seller.images.length > 0 ? (
+        seller.images.map((image, index) => (
+          <div key={index} className="relative">
+            {image ? (
+              <img
+                src={image}
+                alt={seller.title}
+                className="object-cover w-full h-[300px] rounded-lg"
+              />
+            ) : (
+              <img
+                src={Image_Not_available}
+                alt="Image not available"
+                className="object-cover w-full h-[300px] rounded-lg"
+              />
+            )}
+          </div>
+        ))
+      ) : (
+        <div className="relative">
+          <img
+            src={Image_Not_available}
+            alt="Image not available"
+            className="object-contain h-60 w-60 rounded-lg mt-16"
+          />
+        </div>
+      )}
           </Carousel>
         </div>
           <div className="w-full md:w-1/2 mb-4 md:mb-0">
             {/* Title */}
             <h2 className="text-2xl font-bold text-left mb-4">{seller.title}</h2>
 
-            <div className="grid cols-1 md:grid-cols-1 lg:grid-cols-1 xl:grid-cols-1  gap-y-4">
+            <div className="grid cols-1 md:grid-cols-1 lg:grid-cols-1  xl:grid-cols-1  gap-y-4">
               {/* Detail items */}
               {seller.weight && (
                 <div className="flex items-center">
@@ -59,8 +77,8 @@ const SellerDetailModal = ({ seller, isOpen, onClose }) => {
 
               <div className="flex items-center">
                 <MdOutlineCurrencyRupee className="text-gray-500 mr-2" />
-                <span className="font-semibold text-gray-800">Price:</span>
-                <span className="ml-2 text-gray-700 font-medium">{seller.price || "N/A"}</span>
+                <span className="font-semibold text-gray-800">Size:</span>
+                <span className="ml-2 text-gray-700 font-medium">{seller.size || "N/A"}</span>
               </div>
 
               <div className="flex items-center">
@@ -126,4 +144,4 @@ const SellerDetailModal = ({ seller, isOpen, onClose }) => {
   );
 };
 
-export default SellerDetailModal;
+export default BuyerModal;

@@ -105,7 +105,7 @@ function Navbar() {
         <li className="md:block lg:block p-4 w-20 h-10 cursor-pointer font-semibold hover:text-black hidden">
           Contact
         </li>
-        <li className="px-10 w-20 h-10 hidden md:block lg:block">
+        {/* <li className="px-10 w-20 h-10 hidden md:block lg:block">
           <div className="flex flex-row">
             <input
               type="search"
@@ -116,7 +116,7 @@ function Navbar() {
               <ImSearch className="right-6 relative" />
             </div>
           </div>
-        </li>
+        </li> */}
       </ul>
 
       <ul className="hidden md:flex items-center gap-[2vw]">
@@ -125,7 +125,7 @@ function Navbar() {
         </li> */}
 
         {user ? (
-          <div className="relative">
+          <div className="relative mr-2">
             <div className="bg-amber-300 h-10 w-10 rounded-full p-2 flex items-center justify-center">
               <IoPerson
                 size={30}
@@ -204,76 +204,110 @@ function Navbar() {
         </div>
       )}
 
-      {/* Profile Modal */}
-      {showProfileModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-          <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-md mx-auto">
-            <h2 className="text-xl font-bold mb-4 text-center">User Profile</h2>
-            <p className="text-gray-700 mb-2">
-              <strong>Name:</strong> {user.name}
-            </p>
-            <p className="text-gray-700 mb-2">
-              <strong>Phone:</strong> {user.phone}
-            </p>
+   {/* Profile Modal */}
+   {showProfileModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+    <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-sm md:max-w-lg lg:max-w-xl mx-auto my-8 max-h-[80vh] overflow-hidden">
+      <h2 className="text-xl font-bold mb-4 text-center">User Profile</h2>
+      <div className="grid grid-cols-2 gap-2 mb-4">
+        <p className="text-gray-700">
+          <strong>Name:</strong> {user.name}
+        </p>
+        <p className="text-gray-700">
+          <strong>Phone:</strong> {user.phone}
+        </p>
+        <p className="text-gray-700">
+          <strong>Thaluka:</strong> {user.thaluka}
+        </p>
+        <p className="text-gray-700">
+          <strong>District:</strong> {user.district}
+        </p>
+       
+      </div>
 
-            {/* Product List */}
-            <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Products</h3>
-              {products.length > 0 ? (
-                <ul>
-                  {products.map((product) => (
-                    <li
-                      key={product._id}
-                      className="mb-2 flex justify-between items-center"
-                    >
-                      <div>
-                        <strong>{product.title}</strong>: {product.description}{" "}
-                        - Rs.{product.price}
+      {/* Product List */}
+      <div className="mt-4">
+        <h3 className="text-lg font-semibold mb-2">Products</h3>
+        {products.length > 0 ? (
+          <div className="max-h-48 overflow-y-auto">
+            <table className="min-w-full border-collapse">
+              <thead>
+                <tr className="bg-gray-100">
+                  <th className="border px-4 py-2 text-left">Title</th>
+                  <th className="border px-4 py-2 text-left">Sale Type</th>
+                  <th className="border px-4 py-2 text-left">Id</th>
+                  <th className="border px-4 py-2 text-left">Images</th>
+                </tr>
+              </thead>
+              <tbody>
+                {products.map((product) => (
+                  <tr key={product._id}>
+                    <td className="border px-4 py-2">{product.title}</td>
+                    <td className="border px-4 py-2">{product.saleType}</td>
+                    <td className="border px-4 py-2">{product.unique_id}</td>
+                    <td className="border px-4 py-2">
+                      <div className="flex items-center">
+                        {product.images && product.images.length > 0 ? (
+                          <>
+                            <button
+                              onClick={() => openImageModal(product.images[0])}
+                              className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full mx-1"
+                            >
+                              <img
+                                src={product.images[0]}
+                                alt={product.title}
+                                className="w-full h-full object-cover rounded-full"
+                              />
+                            </button>
+                            {product.images.length > 1 && (
+                              <button
+                                onClick={() => openImageModal(product.images[1])}
+                                className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full mx-1"
+                              >
+                                <img
+                                  src={product.images[1]}
+                                  alt={product.title}
+                                  className="w-full h-full object-cover rounded-full"
+                                />
+                              </button>
+                            )}
+                          </>
+                        ) : (
+                          <span className="text-gray-400">No Image</span>
+                        )}
                       </div>
-                      <img
-                        src={
-                          product.images && product.images.length > 0
-                            ? product.images[0]
-                            : "fallback_image_url"
-                        }
-                        alt={product.title}
-                        className="w-10 h-10 object-cover rounded-md"
-                      />
-                      <img
-                        src={
-                          product.images && product.images.length > 0
-                            ? product.images[1]
-                            : "fallback_image_url"
-                        }
-                        alt={product.title}
-                        className="w-10 h-10 object-cover rounded-md"
-                      />
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p>No products found for this user.</p>
-              )}
-            </div>
-
-            <div className="flex justify-between mt-4">
-            <button
-                className="flex-1 bg-slate-300 text-gray-500 hover:text-gray-700 py-2 rounded-md mr-2"
-                onClick={() => setShowProfileModal(false)}
-              >
-                Close
-              </button>
-              <button
-                className="flex-1 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 ml-2"
-                onClick={handleLogout}
-              >
-                Logout
-              </button>
-            
-            </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
-      )}
+        ) : (
+          <p>No products found for this user.</p>
+        )}
+      </div>
+
+      <div className="flex justify-between mt-4">
+        <button
+          className="flex-1 bg-slate-300 text-gray-500 hover:text-gray-700 py-2 rounded-md mr-2"
+          onClick={() => setShowProfileModal(false)}
+        >
+          Close
+        </button>
+        <button
+          className="flex-1 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 ml-2"
+          onClick={handleLogout}
+        >
+          Logout
+        </button>
+      </div>
+    </div>
+  </div>
+)}
+
+
+
+
     </div>
   );
 }

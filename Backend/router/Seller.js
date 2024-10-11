@@ -7,7 +7,7 @@
     const cloudinary = require('cloudinary').v2;
     const multer = require('multer');
 
-    // Configure Cloudinary
+  
     cloudinary.config({
         cloud_name: 'dmglyorxo',
         api_key: '453864331963336',

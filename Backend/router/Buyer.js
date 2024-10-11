@@ -16,7 +16,7 @@ const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
 router.post("/Buyer_one_time", upload.array('images', 5), async (req, res) => {
-    const { title, description, category, size, name, phone, address } = req.body;
+    const { title, description, category, size, name, phone, address, sector, companyName } = req.body;
     console.log('Request body:', req.body);
 
 
@@ -54,7 +54,9 @@ router.post("/Buyer_one_time", upload.array('images', 5), async (req, res) => {
             size,
             name,
             phone,
-            address
+            address,
+            sector,
+            sector_name: companyName
         })
         await buyerrequest.save();
         // user.products.push(buyerrequest);

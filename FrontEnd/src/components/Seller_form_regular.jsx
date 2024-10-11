@@ -87,63 +87,70 @@ const ProductForm = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    
-    const userDataString = localStorage.getItem('userData');
+
+    const userDataString = localStorage.getItem("userData");
     const userData = userDataString ? JSON.parse(userDataString) : null;
 
     if (!userData) {
-        alert('User not found. Please log in again.');
-        return;
+      alert("User not found. Please log in again.");
+      return;
     }
 
     // Check the user's current product count
-    const response = await fetch(`http://localhost:5000/api/checkUserProducts?phone=${userData.phone}`);
+    const response = await fetch(
+      `http://localhost:5000/api/checkUserProducts?phone=${userData.phone}`
+    );
     const result = await response.json();
 
     if (response.ok && result.productCount >= 5) {
-        alert('You already have 5 products. Please remove one before adding a new one.');
-        return;
+      alert(
+        "You already have 5 products. Please remove one before adding a new one."
+      );
+      return;
     }
 
-    const organic = event.target.organic.value === 'true'; // Convert to boolean
+    const organic = event.target.organic.value === "true"; // Convert to boolean
     const formData = new FormData();
-    formData.append('title', event.target.title.value);
-    formData.append('description', event.target.description.value);
-    formData.append('category', selectedCategory ? selectedCategory.value : '');
-    formData.append('organic', organic);
-    formData.append('price', parseFloat(event.target.price.value));
-    formData.append('name', event.target.name.value);
-    formData.append('phone', event.target.phone.value);
-    formData.append('address', event.target.address.value);
+    formData.append("title", event.target.title.value);
+    formData.append("description", event.target.description.value);
+    formData.append("category", selectedCategory ? selectedCategory.value : "");
+    formData.append("organic", organic);
+    formData.append("price", parseFloat(event.target.price.value));
+    formData.append("name", event.target.name.value);
+    formData.append("phone", event.target.phone.value);
+    formData.append("address", event.target.address.value);
 
     // Append image files to formData
-    imageFiles.forEach(file => {
-        formData.append('images', file); // Use the actual file, not the preview URL
+    imageFiles.forEach((file) => {
+      formData.append("images", file); // Use the actual file, not the preview URL
     });
 
     if (imageFiles.length === 0) {
-        alert('No images uploaded. Please upload images before submitting.');
-        return;
+      alert("No images uploaded. Please upload images before submitting.");
+      return;
     }
 
     try {
-        const response = await fetch('http://localhost:5000/api/Seller_regular_sale', {
-            method: 'POST',
-            body: formData,
-        });
-
-        const data = await response.json();
-        if (response.ok) {
-            alert('Product request submitted successfully!');
-            // Reset the form or navigate as needed
-        } else {
-            alert(data.message || 'Failed to submit the product request.');
+      const response = await fetch(
+        "http://localhost:5000/api/Seller_regular_sale",
+        {
+          method: "POST",
+          body: formData,
         }
+      );
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("Product request submitted successfully!");
+        // Reset the form or navigate as needed
+      } else {
+        alert(data.message || "Failed to submit the product request.");
+      }
     } catch (error) {
-        alert('Error submitting the form: ' + error.message);
-        console.error(error);
+      alert("Error submitting the form: " + error.message);
+      console.error(error);
     }
-};
+  };
 
   return (
     <>
@@ -337,6 +344,23 @@ const ProductForm = () => {
             </label>
           </div>
 
+          <p className="mt-6 text-sm text-gray-600 text-justify">
+            <span className="text-red-500 text-xl"> * </span>
+            <p className="inline text-justify">
+              இந்த Appன் மூலம் விவரனை செய்வில் பொருளுக்கு 2% அல்லது Rs 1000
+              இதிலும் எது குறைவோ அதே கட்டணம் தரசம் மதிக்கிறது.
+            </p>
+            <br></br>
+            <span className="text-red-500 text-xl"> * </span> பதிவுகள் இலவசம்
+            ஒரு ID க்கு ஐந்து பொருட்கள் மட்டுமே பதிவு செய்யலாம்<br></br>
+            <span className="text-red-500 text-xl"> * </span> ஒரு முறை விற்பனை
+            பகுதியில் பதிவுகள் 30 நாட்கள் வரை இருக்கும் தொடர் விற்பனை பகுதியில்
+            பதிவுகள் 150 நாட்கள் வரை இருக்கும் 150 நாட்களுக்குப் பிறகு தங்கள்
+            பதிவுகளை புதுப்பித்துக் கொள்ள வேண்டும்<br></br>
+            <span className="text-red-500 text-xl"> * </span> இந்த தளத்தின்
+            மூலம் விற்பனை செய்யப்படும், அல்லது வாங்கப்படும் பொருட்களுக்கு 2%
+            அல்லது ₹1000 இதில் எது குறைவானதோ அதை கமிஷனாக தர சம்மதிக்கிறேன்
+          </p>
           {/* Preview and Submit Buttons */}
           <div className="flex justify-center space-x-4">
             <button
@@ -355,10 +379,6 @@ const ProductForm = () => {
         </form>
 
         {/* Footer terms text */}
-        <p className="mt-6 text-sm text-gray-600">
-          இந்த Appன் மூலம் விவரனை செய்வில் பொருளுக்கு 2% அல்லது Rs 1000 இதிலும்
-          எது குறைவோ அதே கட்டணம் தரசம் மதிக்கிறது.
-        </p>
       </div>
     </>
   );

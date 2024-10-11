@@ -22,7 +22,7 @@
     app.use(cors());
 
 
-    app.use('/  ', registerRoute);
+    app.use('/api', registerRoute);
     app.use("/api", GET_seller);
     app.use('/api', loginRoute);
     app.use('/api', seller);

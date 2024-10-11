@@ -20,7 +20,19 @@ const userSchema = new mongoose.Schema({
     },
     address: {
         type: String,
-        required: true,
+        // required: true,
+    },
+    place:{
+        type: String,
+        // required: true,
+    },
+    thaluka:{
+        type: String,
+        // required: true,
+    },
+    district:{
+        type: String,
+        // required: true,
     },
     products: [{
         title: String,
@@ -33,6 +45,9 @@ const userSchema = new mongoose.Schema({
         status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
         saleType:  String,
         unique_id: Number,
+        category_comes: String,
+        sector: String,
+        sector_name: String,
         Approved_at: { type: Date, default: null },
     }],
 });

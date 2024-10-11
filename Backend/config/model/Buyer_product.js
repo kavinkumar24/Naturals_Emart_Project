@@ -11,6 +11,8 @@ const BuyerRequestSchema = new mongoose.Schema({
     name: String,
     phone: String,
     address: String,
+    sector: String,
+    sector_name : String,
     status: { type: String, enum: ['pending', 'approved', 'rejected'], default: 'pending' },
     user: {
         type: mongoose.Schema.Types.ObjectId,

@@ -1,10 +1,20 @@
 import React, { useState } from "react";
-import { AiOutlineUser, AiOutlineMail, AiOutlinePhone, AiOutlineLock, AiOutlineCheck } from "react-icons/ai";
+import {
+  AiOutlineUser,
+  AiOutlineMail,
+  AiOutlinePhone,
+  AiOutlineLock,
+  
+} from "react-icons/ai";
+import { AiOutlineCheck } from "react-icons/ai";
+
+
+import { MdLocationOn } from "react-icons/md"; // Using this for location instead
+import { PiAddressBook } from "react-icons/pi";
 import Navbar from "./Navbar";
 import axios from "axios";
-import { ToastContainer, toast } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
-import { PiAddressBook } from "react-icons/pi";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 function Register() {
   const [formData, setFormData] = useState({
@@ -12,8 +22,12 @@ function Register() {
     email: "",
     phone: "",
     address: "",
+    place: "",
+    thaluka: "",
+    district: "",
     password: "",
-    confirmpassword: ""
+    confirmpassword: "",
+
   });
   const [errorMessage, setErrorMessage] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -53,12 +67,17 @@ function Register() {
     setIsSuccess(false);
 
     try {
-      const response = await axios.post("http://localhost:5000/api/register", formData);
+      const response = await axios.post(
+        "http://localhost:5000/api/register",
+        formData
+      );
       setIsSuccess(true);
       toast.success(response.data.message); // Show success toast
     } catch (error) {
       console.error("Error registering user:", error.response || error.message);
-      setErrorMessage(error.response?.data.message || "An error occurred. Please try again.");
+      setErrorMessage(
+        error.response?.data.message || "An error occurred. Please try again."
+      );
       if (error.response?.status === 400) {
         toast.error(error.response.data.message); // Show error toast for existing mobile number
       }
@@ -81,33 +100,67 @@ function Register() {
             </div>
           ) : (
             <>
-              <h2 className="text-2xl font-bold text-center mb-6">Register / பதிவு</h2>
-              {errorMessage && <p className="text-red-500 text-center mb-4">{errorMessage}</p>}
+              <h2 className="text-2xl font-bold text-center mb-6">
+                Register / பதிவு
+              </h2>
+              {errorMessage && (
+                <p className="text-red-500 text-center mb-4">{errorMessage}</p>
+              )}
               {isSubmitting && (
                 <div className="h-1 bg-blue-500 transition-all duration-300 mb-4"></div>
               )}
               <form onSubmit={handleSubmit}>
-                {["name", "phone","address", "password", "confirmpassword"].map((field) => (
+                {[
+                  "name",
+                  "phone",
+                  "address",
+                  "place",
+                  "thaluka",
+                  "district",
+                  "password",
+                  "confirmpassword",
+                ].map((field) => (
                   <div className="mb-4" key={field}>
-                    <label className="block text-gray-700 text-sm mb-2" htmlFor={field}>
-                      {field.charAt(0).toUpperCase() + field.slice(1).replace(/([A-Z])/g, ' $1')}
+                    <label
+                      className="block text-gray-700 text-sm mb-2"
+                      htmlFor={field}
+                    >
+                      {field.charAt(0).toUpperCase() +
+                        field.slice(1).replace(/([A-Z])/g, " $1")}
                     </label>
                     <div className="flex items-center border border-gray-300 bg-white shadow-md rounded-md px-3 py-2 focus-within:border-green-500">
                       <input
                         id={field}
-                        type={field.includes("password") ? "password" : field === "phone" ? "tel" : "text"}
-                        placeholder={field.charAt(0).toUpperCase() + field.slice(1)}
+                        type={
+                          field.includes("password")
+                            ? "password"
+                            : field === "phone"
+                            ? "tel"
+                            : "text"
+                        }
+                        placeholder={
+                          field.charAt(0).toUpperCase() + field.slice(1)
+                        }
                         value={formData[field]}
                         onChange={handleChange}
                         className="appearance-none w-full bg-transparent outline-none border-none focus:outline-none"
                       />
                       <span className="text-gray-500 ml-2">
-                        {field === "name" ? <AiOutlineUser /> : field === "email" ? <AiOutlineMail /> : field === "phone" ? <AiOutlinePhone /> :
-                        field === "address" ? <PiAddressBook />
-                        : <AiOutlineLock />
-
-                        
-                        }
+                        {field === "name" ? (
+                          <AiOutlineUser />
+                        ) : field === "email" ? (
+                          <AiOutlineMail />
+                        ) : field === "phone" ? (
+                          <AiOutlinePhone />
+                        ) : field === "address" ? (
+                          <PiAddressBook />
+                        ) : field === "place" ? (
+                          <MdLocationOn />
+                        ) : field === "thaluka" || field === "district" ? (
+                          <MdLocationOn />
+                        ) : field.includes("password") ? (
+                          <AiOutlineLock />
+                        ) : null}
                       </span>
                     </div>
                   </div>
@@ -123,11 +176,13 @@ function Register() {
           )}
           <p className="text-center mt-4 text-gray-500">
             Already have an account?{" "}
-            <a href="/login" className="text-[#089B7D] font-semibold">Login</a>
+            <a href="/login" className="text-[#089B7D] font-semibold">
+              Login
+            </a>
           </p>
         </div>
       </div>
-      <ToastContainer /> 
+      <ToastContainer />
     </div>
   );
 }

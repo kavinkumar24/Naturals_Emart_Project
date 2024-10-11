@@ -29,7 +29,7 @@ router.post('/login', async (req, res) => {
     res.status(200).json({ 
       message: 'Login successful', 
       token, 
-      user: { name: user.name, phone: user.phone } 
+      user: { name: user.name, phone: user.phone, thaluka:user.thaluka, district: user.district, addres:user.address, place:user.place} 
     });
   } catch (error) {
     console.error('Error during login:', error);
