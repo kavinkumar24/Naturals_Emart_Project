@@ -98,7 +98,7 @@ const ProductForm = () => {
 
     // Check the user's current product count
     const response = await fetch(
-      `http://localhost:5000/api/checkUserProducts?phone=${userData.phone}`
+      `https://naturals-emart-project.onrender.com/api/checkUserProducts?phone=${userData.phone}`
     );
     const result = await response.json();
 
@@ -132,7 +132,7 @@ const ProductForm = () => {
 
     try {
       const response = await fetch(
-        "http://localhost:5000/api/Seller_regular_sale",
+        "https://naturals-emart-project.onrender.com/api/Seller_regular_sale",
         {
           method: "POST",
           body: formData,
