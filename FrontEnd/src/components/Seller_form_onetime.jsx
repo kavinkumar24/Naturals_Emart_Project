@@ -227,12 +227,14 @@ const ProductForm = () => {
 
   return (
     <>
-      {isloading && (
-        <div className="flex items-center justify-center h-screen">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
-          <p className="ml-4">Loading Buyer form...</p>
-        </div>
-      )}
+      {isloading ? (
+    <div className="flex items-center justify-center h-screen">
+      <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-blue-600"></div>
+      <p className="ml-4">Loading Buyer form...</p>
+    </div>
+  ) : (
+    <>
+    
       <Navbar />
       <ToastContainer />
       <div className="bg-gray-100 p-8 rounded-lg shadow-lg max-w-3xl mx-auto mt-20">
@@ -509,6 +511,10 @@ const ProductForm = () => {
         {/* Footer terms text */}
       </div>
     </>
+  )}
+</>
+
+    
   );
 };
 
