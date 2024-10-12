@@ -7,6 +7,38 @@
     {
       "src": "/seller",
       "dest": "/"
+    },
+    {
+      "src":"/buyer",
+      "dest":"/"
+    },
+    {
+      "src":"/login",
+      "dest":"/"
+    },
+    {
+      "src":"/register",
+      "dest":"/"
+    },
+    {
+      "src":"/admin/login",
+      "dest":"/"
+    },
+    {
+      "src":"/admin",
+      "dest":"/"
+    },
+    {
+      "src":"/one_time_sell_form",
+      "dest":"/"
+    },
+    {
+     "src":"/regular_sell_form" ,
+      "dest":"/"
+    },
+    {
+      "src":"/buyer_form",
+      "dest":"/"
     }
   ]
 }
