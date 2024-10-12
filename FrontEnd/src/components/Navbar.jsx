@@ -20,43 +20,43 @@ function Navbar() {
   const [products, setProducts] = useState([]);
   const [isLoggedIn, setLoggedIn] = useState(false);
 
- 
-
   const fetchUserSession = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5000/api/usersession/${userId}`, {
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include JWT token if needed
-        },
-      });
+      const response = await fetch(
+        `https://naturals-emart-project.onrender.com/api/usersession/${userId}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Include JWT token if needed
+          },
+        }
+      );
       const data = await response.json();
-  
-      setLoggedIn(data.isLoggedIn)
-      console.log(data.isLoggedIn)
-      console.log("hurnfd",isLoggedIn)
+
+      setLoggedIn(data.isLoggedIn);
+      console.log(data.isLoggedIn);
+      console.log("hurnfd", isLoggedIn);
       if (!response.ok) {
         const errorData = await response.json();
-        console.error('Error fetching user session:', errorData.message);
+        console.error("Error fetching user session:", errorData.message);
         return;
       }
-  
-      const sessionData = await response.json();
-      console.log('User session data:', sessionData);
-  
-      // Store user_id in local storage
-      localStorage.setItem('user_id', sessionData.userId); 
 
+      const sessionData = await response.json();
+      console.log("User session data:", sessionData);
+
+      // Store user_id in local storage
+      localStorage.setItem("user_id", sessionData.userId);
     } catch (error) {
-      console.error('Error fetching user session:', error);
+      console.error("Error fetching user session:", error);
     }
   };
   useEffect(() => {
-    const userData = JSON.parse(localStorage.getItem('userData'));
-    const userId = userData ? userData.user_id : null; 
-    
+    const userData = JSON.parse(localStorage.getItem("userData"));
+    const userId = userData ? userData.user_id : null;
+
     fetchUserSession(userId);
-    console.log(userId,"g hjkl")
+    console.log(userId, "g hjkl");
 
     if (userId) {
       const userData = JSON.parse(localStorage.getItem("userData"));
@@ -73,7 +73,7 @@ function Navbar() {
             throw new Error("Network response was not ok");
           }
           const data = await response.json();
-          console.log(data,"kkkfile")
+          console.log(data, "kkkfile");
           setProducts(data.products || []);
           console.log("Product data:", data.products);
         } catch (error) {
@@ -86,8 +86,7 @@ function Navbar() {
   }, [isLoggedIn]);
 
   useEffect(() => {
-   
-    if (isLoggedIn ) {
+    if (isLoggedIn) {
       const userData = JSON.parse(localStorage.getItem("userData"));
       setUser(userData);
       console.log("User data:", userData);
@@ -111,38 +110,38 @@ function Navbar() {
   };
   const handleLogout = async () => {
     try {
-      const userId = JSON.parse(localStorage.getItem('userData')).user_id; // Get user ID from local storage
-  
+      const userId = JSON.parse(localStorage.getItem("userData")).user_id; // Get user ID from local storage
+
       // Send logout request to the server
-      await fetch(`http://localhost:5000/api/usersession/logout/${userId}`, {
-        method: 'PUT', // Assuming you want to update the session
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`, // Include JWT if needed
-        },
-      });
-  
+      await fetch(
+        `https://naturals-emart-project.onrender.com/api/usersession/logout/${userId}`,
+        {
+          method: "PUT", // Assuming you want to update the session
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Include JWT if needed
+          },
+        }
+      );
+
       // Clear local storage
       localStorage.removeItem("isLoggedIn");
       localStorage.removeItem("userData");
       localStorage.removeItem("token"); // Also remove the token
-  
+
       // Navigate to login page
       navigate("/login");
     } catch (error) {
-      console.error('Logout error:', error);
-      alert('An error occurred while logging out. Please try again.');
+      console.error("Logout error:", error);
+      alert("An error occurred while logging out. Please try again.");
     }
   };
-  
 
   return (
     <div
       className={`flex justify-between items-center h-24 max-w-6xl mx-auto px-4`}
     >
-      {load && (
-        <Load />
-      )}
+      {load && <Load />}
 
       <img
         src={logo}
@@ -197,7 +196,7 @@ function Navbar() {
             className="flex items-center p-4 mx-2 cursor-pointer"
             onClick={() => navigate("/login")}
           >
-            <AiOutlineLogin className='mr-2' /> Login
+            <AiOutlineLogin className="mr-2" /> Login
           </li>
         )}
       </ul>
@@ -258,108 +257,107 @@ function Navbar() {
                 <ImSearch className="ml-2" />
               </div>
             </li>
-  <li>
-<button onClick ={()=>navigate('/admin')}>
-admin</button>
-</li>
+            <li>
+              <button onClick={() => navigate("/admin")}>admin</button>
+            </li>
           </ul>
         </div>
       )}
 
-   {/* Profile Modal */}
-   {showProfileModal && (
-  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-    <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-sm md:max-w-lg lg:max-w-xl mx-auto my-8 max-h-[80vh] overflow-hidden">
-      <h2 className="text-xl font-bold mb-4 text-center">User Profile</h2>
-      <div className="grid grid-cols-2 gap-2 mb-4">
-        <p className="text-gray-700">
-          <strong>Name:</strong> {user.name}
-        </p>
-        <p className="text-gray-700">
-          <strong>Phone:</strong> {user.phone}
-        </p>
-        <p className="text-gray-700">
-          <strong>Thaluka:</strong> {user.thaluka}
-        </p>
-        <p className="text-gray-700">
-          <strong>District:</strong> {user.district}
-        </p>
-       
-      </div>
+      {/* Profile Modal */}
+      {showProfileModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white p-8 rounded-lg shadow-lg w-11/12 max-w-sm md:max-w-lg lg:max-w-xl mx-auto my-8 max-h-[80vh] overflow-hidden">
+            <h2 className="text-xl font-bold mb-4 text-center">User Profile</h2>
+            <div className="grid grid-cols-2 gap-2 mb-4">
+              <p className="text-gray-700">
+                <strong>Name:</strong> {user.name}
+              </p>
+              <p className="text-gray-700">
+                <strong>Phone:</strong> {user.phone}
+              </p>
+              <p className="text-gray-700">
+                <strong>Thaluka:</strong> {user.thaluka}
+              </p>
+              <p className="text-gray-700">
+                <strong>District:</strong> {user.district}
+              </p>
+            </div>
 
-      {/* Product List */}
-      <div className="mt-4">
-        <h3 className="text-lg font-semibold mb-2">Products</h3>
-        {products.length > 0 ? (
-          <div className="max-h-48 overflow-y-auto">
-            <table className="min-w-full border-collapse">
-              <thead>
-                <tr className="bg-gray-100">
-                  <th className="border px-4 py-2 text-left">Title</th>
-                  <th className="border px-4 py-2 text-left">Sale Type</th>
-                  <th className="border px-4 py-2 text-left">Id</th>
-                  <th className="border px-4 py-2 text-left">Images</th>
-                </tr>
-              </thead>
-              <tbody>
-  {products.map((product) => (
-    <tr key={product._id}>
-      <td className="border px-4 py-2">{product.title}</td>
-      <td className="border px-4 py-2">{product.saleType}</td>
-      <td className="border px-4 py-2">{product.unique_id}</td>
-      <td className="border px-4 py-2">
-        <div className="flex items-center">
-          {product.images && product.images.length > 0 ? (
-            product.images.map((image, index) => (
+            {/* Product List */}
+            <div className="mt-4">
+              <h3 className="text-lg font-semibold mb-2">Products</h3>
+              {products.length > 0 ? (
+                <div className="max-h-48 overflow-y-auto">
+                  <table className="min-w-full border-collapse">
+                    <thead>
+                      <tr className="bg-gray-100">
+                        <th className="border px-4 py-2 text-left">Title</th>
+                        <th className="border px-4 py-2 text-left">
+                          Sale Type
+                        </th>
+                        <th className="border px-4 py-2 text-left">Id</th>
+                        <th className="border px-4 py-2 text-left">Images</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {products.map((product) => (
+                        <tr key={product._id}>
+                          <td className="border px-4 py-2">{product.title}</td>
+                          <td className="border px-4 py-2">
+                            {product.saleType}
+                          </td>
+                          <td className="border px-4 py-2">
+                            {product.unique_id}
+                          </td>
+                          <td className="border px-4 py-2">
+                            <div className="flex items-center">
+                              {product.images && product.images.length > 0 ? (
+                                product.images.map((image, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => openImageModal(image)}
+                                    className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full mx-1"
+                                  >
+                                    <img
+                                      src={image}
+                                      alt={product.title}
+                                      className="w-full h-full object-cover rounded-full"
+                                    />
+                                  </button>
+                                ))
+                              ) : (
+                                <span className="text-gray-400">No Image</span>
+                              )}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p>No products found for this user.</p>
+              )}
+            </div>
+
+            <div className="flex justify-between mt-4">
               <button
-                key={index}
-                onClick={() => openImageModal(image)}
-                className="w-10 h-10 flex items-center justify-center bg-gray-200 rounded-full mx-1"
+                className="flex-1 bg-slate-300 text-gray-500 hover:text-gray-700 py-2 rounded-md mr-2"
+                onClick={() => setShowProfileModal(false)}
               >
-                <img
-                  src={image}
-                  alt={product.title}
-                  className="w-full h-full object-cover rounded-full"
-                />
+                Close
               </button>
-            ))
-          ) : (
-            <span className="text-gray-400">No Image</span>
-          )}
-        </div>
-      </td>
-    </tr>
-  ))}
-</tbody>
-
-            </table>
+              <button
+                className="flex-1 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 ml-2"
+                onClick={handleLogout}
+              >
+                Logout
+              </button>
+            </div>
           </div>
-        ) : (
-          <p>No products found for this user.</p>
-        )}
-      </div>
-
-      <div className="flex justify-between mt-4">
-        <button
-          className="flex-1 bg-slate-300 text-gray-500 hover:text-gray-700 py-2 rounded-md mr-2"
-          onClick={() => setShowProfileModal(false)}
-        >
-          Close
-        </button>
-        <button
-          className="flex-1 bg-red-500 text-white py-2 rounded-md hover:bg-red-600 ml-2"
-          onClick={handleLogout}
-        >
-          Logout
-        </button>
-      </div>
-    </div>
-  </div>
-)}
-
-
-
-
+        </div>
+      )}
     </div>
   );
 }
